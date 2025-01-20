@@ -17,19 +17,25 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
+use Filament\Facades\Filament;
 
 class SuperadminPanelProvider extends PanelProvider
 {
+
+
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->default()
             ->id('superadmin')
             ->path('superadmin')
+            //bisa hide di desktop
             ->sidebarCollapsibleOnDesktop()
             ->login()
+            //Ganti Warna
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
