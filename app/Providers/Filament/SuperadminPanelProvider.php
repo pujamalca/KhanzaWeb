@@ -32,7 +32,12 @@ class SuperadminPanelProvider extends PanelProvider
             ->path('superadmin')
             //bisa hide di desktop
             ->sidebarCollapsibleOnDesktop()
+
+            ->favicon('/fadhila.png') // Tambahkan favicon di sini
             ->login()
+            // ->profile() // Menambahkan halaman profil bawaan
+            // ->sidebar()
+            // ->notifications()
             //Ganti Warna
             ->colors([
                 'primary' => Color::Sky,
