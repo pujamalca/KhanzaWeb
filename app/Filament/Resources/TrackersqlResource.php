@@ -20,6 +20,8 @@ class TrackersqlResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-left-end-on-rectangle';
 
+    protected static ?string $navigationGroup = 'Admin';
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -55,18 +57,20 @@ class TrackersqlResource extends Resource
                 //
                 Tables\Columns\TextColumn::make('tanggal')
                 ->label('Tanggal Login')
+                ->searchable(isIndividual:True)
                 ->formatStateUsing(function ($state) {
                     return \Carbon\Carbon::parse($state)->format('d F Y');
                 })
                 ->alignment(Alignment::Center),
                 Tables\Columns\TextColumn::make('usere')
                 ->label('User')
+                ->searchable(isIndividual:True)
                 ->sortable()
                 ->alignment(Alignment::Center),
                 Tables\Columns\TextColumn::make('sqle')
                 ->label('Keterangan')
                 ->sortable()
-                ->searchable()
+                ->searchable(isIndividual:True)
                 ->wrap() // Menggunakan properti wrap() jika tersedia atau kustomisasi
                 ->extraAttributes(['style' => ' white-space: normal; word-wrap: break-word;']),
 
@@ -119,8 +123,8 @@ class TrackersqlResource extends Resource
     {
         return [
             'index' => Pages\ListTrackersqls::route('/'),
-            'create' => Pages\CreateTrackersql::route('/create'),
-            'edit' => Pages\EditTrackersql::route('/{record}/edit'),
+            // 'create' => Pages\CreateTrackersql::route('/create'),
+            // 'edit' => Pages\EditTrackersql::route('/{record}/edit'),
         ];
     }
 }

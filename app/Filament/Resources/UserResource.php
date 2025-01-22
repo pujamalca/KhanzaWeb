@@ -20,6 +20,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
+    protected static ?string $navigationGroup = 'Admin';
+
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Pengguna'; // Setel ke bentuk singular
 
