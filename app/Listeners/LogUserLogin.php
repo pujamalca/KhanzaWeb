@@ -25,7 +25,7 @@ class LogUserLogin
         if ($nip) {
             // Simpan data login ke tabel tracker
             DB::table('tracker')->insert([
-                'nip' => $nip, // Gunakan username sebagai nip
+                'nip' => 'F - ' . $nip, // Gunakan username sebagai nip
                 'tgl_login' => now()->toDateString(), // Tanggal login
                 'jam_login' => now()->toTimeString(), // Jam login
             ]);
