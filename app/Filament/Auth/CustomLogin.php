@@ -45,7 +45,7 @@ class CustomLogin extends Login
             Filament::auth()->logout();
 
             throw ValidationException::withMessages([
-                'data.email' => 'Akun tidak aktif, hubungi Administrator!',
+                'data.login' => 'Akun tidak aktif, hubungi Administrator!',
             ]);
         }
 
@@ -87,6 +87,13 @@ class CustomLogin extends Login
             $login_type => $data['login'],
             'password' => $data['password'],
         ];
+    }
+
+    protected function throwFailureValidationException(): never
+    {
+        throw ValidationException::withMessages([
+            'data.login' => __('filament-panels::pages/auth/login.messages.failed'),
+        ]);
     }
 }
 
