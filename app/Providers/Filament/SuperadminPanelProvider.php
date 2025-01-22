@@ -20,6 +20,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
 
+use App\Filament\Auth\CustomLogin;
+
 class SuperadminPanelProvider extends PanelProvider
 {
 
@@ -34,7 +36,7 @@ class SuperadminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
 
             ->favicon('/fadhila.png') // Tambahkan favicon di sini
-            ->login()
+            ->login(CustomLogin::class)
             // ->profile() // Menambahkan halaman profil bawaan
             // ->sidebar()
             // ->notifications()
