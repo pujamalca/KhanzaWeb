@@ -7,6 +7,11 @@ use App\Listeners\LogUserLogin;
 use Filament\Pages\Auth\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Trackersql;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+
         // Mendaftarkan event dan listener di sini
         Event::listen(
             Login::class,
