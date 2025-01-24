@@ -21,6 +21,7 @@ use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
 
 use App\Filament\Auth\CustomLogin;
+use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
 class SuperadminPanelProvider extends PanelProvider
 {
@@ -66,6 +67,9 @@ class SuperadminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->plugins([
+                SpotlightPlugin::make(),
+            ]);;
     }
 }
