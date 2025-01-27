@@ -8,9 +8,6 @@ class Tracker extends Model
 {
     protected $table = 'tracker';
 
-    // // // Primary key virtual
-    // protected $primaryKey = 'virtual_id';
-
     // Primary key tidak di-increment otomatis
     public $incrementing = false;
 
@@ -29,14 +26,6 @@ class Tracker extends Model
         'tgl_login' => 'date',
     ];
 
-
-    // // Scope untuk filter berdasarkan tanggal
-    // // Scope untuk filter berdasarkan tanggal
-    // public function scopeFilterByDate($query, $date)
-    // {
-    //     return $query->whereDate('tgl_login', $date);
-    // }
-
     // Scope untuk filter berdasarkan rentang tanggal
     public function scopeFilterByDateRange($query, $startDate, $endDate)
     {
@@ -45,10 +34,4 @@ class Tracker extends Model
             \Carbon\Carbon::parse($endDate)->endOfDay(),
         ]);
     }
-
-    // // Buat accessor untuk primary key virtual
-    // public function getVirtualIdAttribute()
-    // {
-    //     return $this->nip . '_' . $this->tgl_login;
-    // }
 }

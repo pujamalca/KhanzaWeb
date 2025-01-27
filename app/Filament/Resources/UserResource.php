@@ -31,8 +31,6 @@ class UserResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Pengguna';
 
-
-
     public static function form(Form $form): Form
     {
         return $form

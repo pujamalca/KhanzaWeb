@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PegawaiResource\Pages;
 use App\Filament\Resources\PegawaiResource\RelationManagers;
+use App\Models\jnj_jabatan;
 use App\Models\Pegawai;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,6 +21,15 @@ class PegawaiResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationGroup = 'SDM';
+
+    // Label jamak, ganti dengan singular jika perlu
+    protected static ?string $pluralLabel = 'Pegawai'; // Setel ke bentuk singular
+
+    // Label seperti button new akan berubah
+    protected static ?string $label = 'Pegawai';
+
+    // title menu akan berubah
+    protected static ?string $navigationLabel = 'Pegawai';
 
     public static function form(Form $form): Form
     {
@@ -44,9 +54,14 @@ class PegawaiResource extends Resource
                     ->label('Jabatan')
                     ->required()
                     ->maxLength(25),
-                Forms\Components\TextInput::make('jnj_jabatan')
-                    ->required()
-                    ->maxLength(5),
+                Forms\Components\Select::make('jnj_jabatan')
+                    ->label('Jenjang Jabatan')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel jnj_jabatan
+                        return jnj_jabatan::all()->pluck('nama', 'kode');
+                    })
+                    ->required() // Field ini wajib diisi
+                    ->placeholder('Pilih Jabatan'),
                 Forms\Components\TextInput::make('kode_kelompok')
                     ->required()
                     ->maxLength(3),

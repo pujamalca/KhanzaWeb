@@ -22,6 +22,15 @@ class TrackersqlResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin';
 
+    // Label jamak, ganti dengan singular jika perlu
+    protected static ?string $pluralLabel = 'Tracker SQL'; // Setel ke bentuk singular
+
+    // Label seperti button new akan berubah
+    protected static ?string $label = 'Tracker SQL';
+
+    // title menu akan berubah
+    protected static ?string $navigationLabel = 'Tracker SQL';
+
     public static function form(Form $form): Form
     {
         return $form->schema([

@@ -9,8 +9,6 @@ class pegawai extends Model
     protected $table = 'pegawai'; // Nama tabel
     protected $primaryKey = 'id'; // Primary key
     public $timestamps = false; // Menonaktifkan timestamps
-    // Primary key tidak di-increment otomatis
-    public $incrementing = false;
 
     // Kolom yang boleh diisi (mass assignment)
     protected $fillable = [
@@ -53,6 +51,12 @@ class pegawai extends Model
     public function jnjJabatan()
     {
         return $this->belongsTo(jnj_jabatan::class, 'jnj_jabatan', 'kode');
+    }
+
+    // Relasi ke tabel kelompok_jabatan
+    public function kelompok_jabatan()
+    {
+        return $this->belongsTo(kelompok_jabatan::class, 'kelompok_jabatan', 'kode_jabatan');
     }
 
 }

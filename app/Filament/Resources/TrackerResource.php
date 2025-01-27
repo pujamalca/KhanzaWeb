@@ -23,6 +23,15 @@ class TrackerResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin';
 
+    // Label jamak, ganti dengan singular jika perlu
+    protected static ?string $pluralLabel = 'Tracker'; // Setel ke bentuk singular
+
+    // Label seperti button new akan berubah
+    protected static ?string $label = 'Tracker';
+
+    // title menu akan berubah
+    protected static ?string $navigationLabel = 'Tracker';
+
     public static function form(Form $form): Form
     {
         return $form
