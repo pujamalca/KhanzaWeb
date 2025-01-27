@@ -30,7 +30,7 @@ class PegawaiResource extends Resource
                     ->required()
                     ->maxLength(20),
                 Forms\Components\TextInput::make('nama')
-                    ->label('Nama Lengkap (Tanpa Gelar)')
+                    ->label('Nama Lengkap (Tanpa Gelar) ya')
                     ->required()
                     ->maxLength(50),
                 Forms\Components\Select::make('jk')
