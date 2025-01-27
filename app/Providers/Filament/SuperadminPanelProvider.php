@@ -19,7 +19,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
-
 use App\Filament\Auth\CustomLogin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
