@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
 use App\Filament\Auth\CustomLogin;
+use Filament\Navigation\UserMenuItem;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
 class SuperadminPanelProvider extends PanelProvider
@@ -37,7 +38,12 @@ class SuperadminPanelProvider extends PanelProvider
 
             ->favicon('/fadhila.png') // Tambahkan favicon di sini
             ->login(CustomLogin::class)
-            // ->profile() // Menambahkan halaman profil bawaan
+            // ->userMenuItems([
+            //     UserMenuItem::make()
+            //         ->label('Profile') // Label untuk menu
+            //         ->url(route('App.Filament.Pages.Profile')) // URL menuju halaman profil
+            //         ->icon('heroicon-o-user'), // Ikon menu
+            // ])
             // ->sidebar()
             // ->notifications()
             //Ganti Warna
