@@ -4,15 +4,24 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PegawaiResource\Pages;
 use App\Filament\Resources\PegawaiResource\RelationManagers;
+use App\Models\bidang;
+use App\Models\departemen;
+use App\Models\emergency_index;
 use App\Models\jnj_jabatan;
+use App\Models\kelompok_jabatan;
 use App\Models\Pegawai;
+use App\Models\resiko_kerja;
+use App\Models\stts_kerja;
+use App\Models\stts_wp;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class PegawaiResource extends Resource
 {
@@ -62,30 +71,66 @@ class PegawaiResource extends Resource
                     })
                     ->required() // Field ini wajib diisi
                     ->placeholder('Pilih Jabatan'),
-                Forms\Components\TextInput::make('kode_kelompok')
-                    ->required()
-                    ->maxLength(3),
-                Forms\Components\TextInput::make('kode_resiko')
-                    ->required()
-                    ->maxLength(3),
-                Forms\Components\TextInput::make('kode_emergency')
-                    ->required()
-                    ->maxLength(3),
-                Forms\Components\TextInput::make('departemen')
-                    ->required()
-                    ->maxLength(4),
-                Forms\Components\TextInput::make('bidang')
-                    ->required()
-                    ->maxLength(15),
-                Forms\Components\TextInput::make('stts_wp')
-                    ->required()
-                    ->maxLength(5),
-                Forms\Components\TextInput::make('stts_kerja')
-                    ->required()
-                    ->maxLength(3),
-                Forms\Components\TextInput::make('npwp')
-                    ->required()
-                    ->maxLength(15),
+                Forms\Components\select::make('kode_kelompok')
+                    ->label('Kode Kelompok')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return kelompok_jabatan::all()->pluck('nama_kelompok', 'kode_kelompok');
+                    })
+                    ->required(),
+                Forms\Components\select::make('kode_resiko')
+                    ->label('Kode Resiko')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return resiko_kerja::all()->pluck('nama_resiko', 'kode_resiko');
+                    })
+                    ->required(),
+                Forms\Components\select::make('kode_emergency')
+                    ->label('Kode Emergency')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return emergency_index::all()->pluck('nama_emergency', 'kode_emergency');
+                    })
+                    ->required(),
+                Forms\Components\select::make('departemen')
+                    ->label('Departemen')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return departemen::all()->pluck('nama', 'departemen');
+                    })
+                    ->required(),
+                Forms\Components\select::make('bidang')
+                    ->label('bidang')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return bidang::all()->pluck('nama', 'bidang');
+                    })
+                    ->required(),
+                Forms\Components\select::make('stts_wp')
+                    ->label('Status Wajib Pajak')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return stts_wp::query()
+                        ->select(DB::raw("CONCAT(stts, ' - ', ktg) as label, stts"))
+                        ->pluck('label', 'stts');
+                    })
+                    ->required(),
+                    Forms\Components\select::make('stts_kerja')
+                    ->label('Status Kerja')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return stts_kerja::query()
+                        ->select(DB::raw("CONCAT(stts, ' - ', ktg) as label, stts"))
+                        ->pluck('label', 'stts');
+                    })
+                    ->required(),
+                TextInput::make('npwp')
+                    ->label('NPWP')
+                    ->numeric() // Hanya angka
+                    ->minLength(16) // Minimal 16 digit
+                    ->maxLength(16) // Maksimal 16 digit
+                    ->rule('digits:16') // Pastikan tepat 16 digit
+                    ->placeholder('Masukkan 16 digit NPWP'),
                 Forms\Components\TextInput::make('pendidikan')
                     ->required()
                     ->maxLength(80),

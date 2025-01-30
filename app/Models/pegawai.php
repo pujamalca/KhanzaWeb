@@ -59,4 +59,40 @@ class pegawai extends Model
         return $this->belongsTo(kelompok_jabatan::class, 'kelompok_jabatan', 'kode_jabatan');
     }
 
+    // Relasi ke tabel kode_resiko
+    public function resiko_kerja()
+    {
+        return $this->belongsTo(resiko_kerja::class, 'resiko_kerja', 'kode_resiko');
+    }
+
+    // Relasi ke tabel kode_emergency
+    public function emergency_index()
+    {
+        return $this->belongsTo(emergency_index::class, 'emergency_index', 'kode_emergency');
+    }
+
+    // Relasi ke tabel departemen
+    public function departemen()
+    {
+        return $this->belongsTo(departemen::class, 'departemen', 'dep_id');
+    }
+
+    // Relasi ke tabel bidang
+    public function bidang()
+    {
+        return $this->belongsTo(bidang::class, 'bidang', 'nama');
+    }
+
+    // Relasi ke tabel stts_wp
+    public function stts_wp()
+    {
+        return $this->belongsTo(stts_wp::class, 'stts_wp', 'stts');
+    }
+
+    // Relasi ke tabel stts_kerja
+    public function stts_kerja()
+    {
+        return $this->belongsTo(stts_kerja::class, 'stts_kerja', 'stts');
+    }
+
 }
