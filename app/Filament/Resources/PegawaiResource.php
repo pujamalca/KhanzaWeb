@@ -140,7 +140,8 @@ class PegawaiResource extends Resource
                 Forms\Components\TextInput::make('no_ktp')
                     ->required()
                     ->maxLength(20),
-            ]);
+            ])
+            ->columns(3);
     }
 
     public static function table(Table $table): Table
