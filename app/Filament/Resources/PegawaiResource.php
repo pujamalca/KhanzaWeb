@@ -4,16 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PegawaiResource\Pages;
 use App\Filament\Resources\PegawaiResource\RelationManagers;
+use App\Models\bank;
 use App\Models\bidang;
 use App\Models\departemen;
 use App\Models\emergency_index;
 use App\Models\jnj_jabatan;
 use App\Models\kelompok_jabatan;
 use App\Models\Pegawai;
+use App\Models\pendidikan;
 use App\Models\resiko_kerja;
 use App\Models\stts_kerja;
 use App\Models\stts_wp;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -92,18 +95,18 @@ class PegawaiResource extends Resource
                         return emergency_index::all()->pluck('nama_emergency', 'kode_emergency');
                     })
                     ->required(),
-                Forms\Components\select::make('departemen')
+                Forms\Components\select::make('dep_id')
                     ->label('Departemen')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
-                        return departemen::all()->pluck('nama', 'departemen');
+                        return departemen::all()->pluck('nama', 'dep_id');
                     })
                     ->required(),
-                Forms\Components\select::make('bidang')
+                Forms\Components\select::make('nama')
                     ->label('bidang')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
-                        return bidang::all()->pluck('nama', 'bidang');
+                        return bidang::all()->pluck('nama', 'nama');
                     })
                     ->required(),
                 Forms\Components\select::make('stts_wp')
@@ -115,7 +118,7 @@ class PegawaiResource extends Resource
                         ->pluck('label', 'stts');
                     })
                     ->required(),
-                    Forms\Components\select::make('stts_kerja')
+                Forms\Components\select::make('stts_kerja')
                     ->label('Status Kerja')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
@@ -131,39 +134,70 @@ class PegawaiResource extends Resource
                     ->maxLength(16) // Maksimal 16 digit
                     ->rule('digits:16') // Pastikan tepat 16 digit
                     ->placeholder('Masukkan 16 digit NPWP'),
-                Forms\Components\TextInput::make('pendidikan')
+                // Di dalam form builder
+                Select::make('tingkat')
+                    ->label('Tingkat Pendidikan')
+                    ->options(pendidikan::pluck('tingkat', 'tingkat')) // Ambil data tingkat
                     ->required()
-                    ->maxLength(80),
-                Forms\Components\TextInput::make('gapok')
+                    ->live() // Aktifkan real-time update
+                    ->afterStateUpdated(function ($set, $state) {
+                        // Ambil nilai gapok1 dari database berdasarkan tingkat yang dipilih
+                        $gapok1 = pendidikan::where('tingkat', $state)->value('gapok1') ?? 0;
+                        $set('gapok1', $gapok1); // Set nilai gapok1 ke form
+                    })
+                    ->native(false),
+                TextInput::make('gapok1')
+                    ->label('Gaji Pokok')
+                    ->live()
+                    ->numeric()
                     ->required()
-                    ->numeric(),
+                    ->disabled(), // Non-editable
                 Forms\Components\TextInput::make('tmp_lahir')
+                    ->label('Tempat Lahir')
+                    ->placeholder('Tempat Lahir')
                     ->required()
                     ->maxLength(20),
                 Forms\Components\DatePicker::make('tgl_lahir')
                     ->required(),
                 Forms\Components\TextInput::make('alamat')
-                    ->required()
                     ->maxLength(60),
                 Forms\Components\TextInput::make('kota')
-                    ->required()
                     ->maxLength(20),
                 Forms\Components\DatePicker::make('mulai_kerja')
                     ->required(),
-                Forms\Components\TextInput::make('ms_kerja')
+                Forms\Components\Select::make('ms_kerja')
+                    ->label('Masa Kerja')
+                    ->options([
+                        '<1' => '<1',
+                        'PT' => 'PT',
+                        'FT>1' => 'FT>1',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('indexins')
                     ->required()
                     ->maxLength(4),
-                Forms\Components\TextInput::make('bpd')
-                    ->required()
-                    ->maxLength(50),
+                Forms\Components\select::make('bank')
+                    ->label('Nama Bank')
+                    ->options(function () {
+                        // Ambil semua jabatan dari tabel
+                        return bank::all()->pluck('namabank', 'namabank');
+                    })
+                    ->required(),
                 Forms\Components\TextInput::make('rekening')
                     ->required()
                     ->maxLength(25),
-                Forms\Components\TextInput::make('stts_aktif')
+                Forms\Components\Select::make('stts_aktif')
+                    ->label('Status Aktif')
+                    ->options([
+                        'AKTIF' => 'AKTIF',
+                        'CUTI' => 'CUTI',
+                        'KELUAR' => 'KELUAR',
+                        'TENAGA LUAR' => 'TENAGA LUAR',
+                        'NON AKTIF' => 'NON AKTIF',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('wajibmasuk')
+                    ->label('Wajib AKtif')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('pengurang')

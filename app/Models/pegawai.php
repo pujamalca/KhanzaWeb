@@ -95,4 +95,16 @@ class pegawai extends Model
         return $this->belongsTo(stts_kerja::class, 'stts_kerja', 'stts');
     }
 
+    // Relasi ke tabel stts_kerja
+    public function pendidikan()
+    {
+        return $this->belongsTo(pendidikan::class, 'pendidikan', 'tingkat');
+    }
+
+    // Relasi ke tabel stts_kerja
+    public function bank()
+    {
+        return $this->belongsTo(bank::class, 'bank', 'namabank');
+    }
+
 }
