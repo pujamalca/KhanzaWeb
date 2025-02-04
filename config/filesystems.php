@@ -37,6 +37,14 @@ return [
             'throw' => false,
         ],
 
+
+        'pegawai_photo' => [
+            'driver' => 'local',
+            'root' => 'C:/xampp/htdocs/webapps/pages/pegawai/photo/', // Lokasi penyimpanan
+            'visibility' => 'public',
+        ],
+
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

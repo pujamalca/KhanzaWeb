@@ -4,11 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class pegawai extends Model
+class Pegawai extends Model
 {
-    protected $table = 'pegawai'; // Nama tabel
-    protected $primaryKey = 'id'; // Primary key
-    public $timestamps = false; // Menonaktifkan timestamps
+    protected $table = 'pegawai';
+    protected $primaryKey = 'id';
+    public $incrementing = true; // Pastikan ini true
+    protected $keyType = 'int'; // Pastikan ini int
+    public $timestamps = false; // Jika tidak menggunakan timestamps
+
+    protected $attributes = [
+        'pengurang' => 0,
+        'indek' => 0,
+        'cuti_diambil' => 0,
+        'dankes' => 0,
+        'npwp' => 0,
+    ];
+
+    protected $casts = [
+        'wajibmasuk' => 'string',
+    ];
+
 
     // Kolom yang boleh diisi (mass assignment)
     protected $fillable = [
@@ -48,7 +63,7 @@ class pegawai extends Model
     ];
 
     // Relasi ke tabel jnj_jabatan
-    public function jnjJabatan()
+    public function jnj_jabatan()
     {
         return $this->belongsTo(jnj_jabatan::class, 'jnj_jabatan', 'kode');
     }

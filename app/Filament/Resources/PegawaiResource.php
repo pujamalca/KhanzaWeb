@@ -16,6 +16,8 @@ use App\Models\resiko_kerja;
 use App\Models\stts_kerja;
 use App\Models\stts_wp;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -25,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PegawaiResource extends Resource
 {
@@ -95,14 +98,17 @@ class PegawaiResource extends Resource
                         return emergency_index::all()->pluck('nama_emergency', 'kode_emergency');
                     })
                     ->required(),
-                Forms\Components\select::make('dep_id')
-                    ->label('Departemen')
-                    ->options(function () {
-                        // Ambil semua jabatan dari tabel
-                        return departemen::all()->pluck('nama', 'dep_id');
-                    })
+                    Select::make('departemen')
+                    ->label('Pilih Departemen')
+                    ->options(Departemen::pluck('nama', 'dep_id')) // Pastikan nama kolom benar
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('indexins', $state)) // Set indexins sesuai departemen
                     ->required(),
-                Forms\Components\select::make('nama')
+
+                Hidden::make('indexins') // Menyembunyikan indexins, tapi tetap tersimpan
+                    ->default(fn ($get) => $get('departemen')),
+                Forms\Components\select::make('bidang')
                     ->label('bidang')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
@@ -127,31 +133,44 @@ class PegawaiResource extends Resource
                         ->pluck('label', 'stts');
                     })
                     ->required(),
-                TextInput::make('npwp')
+                    TextInput::make('npwp')
                     ->label('NPWP')
-                    ->numeric() // Hanya angka
-                    ->minLength(16) // Minimal 16 digit
-                    ->maxLength(16) // Maksimal 16 digit
-                    ->rule('digits:16') // Pastikan tepat 16 digit
-                    ->placeholder('Masukkan 16 digit NPWP'),
+                    ->numeric()
+                    ->minLength(15)
+                    ->maxLength(15)
+                    ->rule(['nullable', 'numeric', 'digits:15']) // ✅ Perbaiki format validasi
+                    ->placeholder('Masukkan 15 digit NPWP')
+                    ->mask('999999999999999')
+                    ->live(),
+
                 // Di dalam form builder
-                Select::make('tingkat')
+                Select::make('pendidikan')
                     ->label('Tingkat Pendidikan')
                     ->options(pendidikan::pluck('tingkat', 'tingkat')) // Ambil data tingkat
                     ->required()
                     ->live() // Aktifkan real-time update
                     ->afterStateUpdated(function ($set, $state) {
-                        // Ambil nilai gapok1 dari database berdasarkan tingkat yang dipilih
+                        // Ambil nilai gapok1 dari database berdasarkan tingkat pendidikan yang dipilih
                         $gapok1 = pendidikan::where('tingkat', $state)->value('gapok1') ?? 0;
-                        $set('gapok1', $gapok1); // Set nilai gapok1 ke form
+
+                        // Set nilai gapok1 ke dalam form
+                        $set('gapok1', $gapok1);
+
+                        // **Pastikan juga menyimpan ke gapok (di tabel pegawai)**
+                        $set('gapok', $gapok1);
                     })
                     ->native(false),
+
                 TextInput::make('gapok1')
                     ->label('Gaji Pokok')
                     ->live()
                     ->numeric()
                     ->required()
                     ->disabled(), // Non-editable
+
+                    // Field gapok untuk disimpan ke tabel pegawai
+                Hidden::make('gapok'), // Hidden agar tidak bisa diubah manual, tapi tetap tersimpan ke DB
+
                 Forms\Components\TextInput::make('tmp_lahir')
                     ->label('Tempat Lahir')
                     ->placeholder('Tempat Lahir')
@@ -173,10 +192,7 @@ class PegawaiResource extends Resource
                         'FT>1' => 'FT>1',
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('indexins')
-                    ->required()
-                    ->maxLength(4),
-                Forms\Components\select::make('bank')
+                Forms\Components\select::make('bpd')
                     ->label('Nama Bank')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
@@ -185,6 +201,7 @@ class PegawaiResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('rekening')
                     ->required()
+                    ->numeric() // Hanya angka
                     ->maxLength(25),
                 Forms\Components\Select::make('stts_aktif')
                     ->label('Status Aktif')
@@ -196,29 +213,37 @@ class PegawaiResource extends Resource
                         'NON AKTIF' => 'NON AKTIF',
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('wajibmasuk')
-                    ->label('Wajib AKtif')
+                Select::make('wajibmasuk')
+                    ->label('Pilih Opsi Wajib Masuk')
+                    ->options([
+                        '-' => '- .Wajib Masuk 1 Bulan - Hari Libur',
+                        '-1' => '-1 .Wajib Masuk Kosong',
+                        '-2' => '-2 .Wajib Masuk 1 Bulan - 4 Hari',
+                        '-3' => '-3 .Wajib Masuk 1 Bulan - 2 Hari - Linas',
+                        '-4' => '-4 .Wajib Masuk 1 Bulan - Hari Akhad',
+                        '-5' => '-5 .Wajib Mengikuti Penjadwalan',
+                    ])
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('pengurang')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('indek')
-                    ->required()
-                    ->numeric(),
+                    ->helperText('Isi dengan "-" jika ingin wajib masuk 1 bulan-hari libur, dan seterusnya.')
+                    ->dehydrateStateUsing(fn ($state) => $state === '-' ? 0 : (int) $state), // Konversi "-" ke 0
                 Forms\Components\DatePicker::make('mulai_kontrak'),
-                Forms\Components\TextInput::make('cuti_diambil')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('dankes')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('photo')
-                    ->maxLength(500)
-                    ->default(null),
+                FileUpload::make('photo')
+                    ->label('Foto Pegawai')
+                    ->image()
+                    ->storeAs(fn ($file) => uniqid() . '.' . $file->getClientOriginalExtension()) // Nama unik
+                    ->storeDisk('pegawai_photo') // Simpan ke storage disk yang sudah dibuat
+                    ->required(),
                 Forms\Components\TextInput::make('no_ktp')
+                    ->label('Nomor KTP')
                     ->required()
-                    ->maxLength(20),
+                    ->numeric() // Hanya angka
+                    ->minLength(16) // Minimal 16 digit
+                    ->maxLength(16) // Maksimal 16 digit
+                    ->rule('digits:16') // Pastikan tepat 16 digit
+                    ->placeholder('Masukkan 16 digit NO KTP')
+                    ->mask('9999999999999999') // Menambahkan format mask 16 digit
+                    ->live(), // Memastikan validasi berjalan secara real-time
+
             ])
             ->columns(3);
     }
@@ -320,12 +345,14 @@ class PegawaiResource extends Resource
         ];
     }
 
+
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPegawais::route('/'),
             'create' => Pages\CreatePegawai::route('/create'),
-            'edit' => Pages\EditPegawai::route('/{record}/edit'),
+            // 'edit' => Pages\EditPegawai::route('/{record}/edit'),
         ];
     }
 }
