@@ -230,8 +230,10 @@ class PegawaiResource extends Resource
                 FileUpload::make('photo')
                     ->label('Foto Pegawai')
                     ->image()
-                    ->storeAs(fn ($file) => uniqid() . '.' . $file->getClientOriginalExtension()) // Nama unik
-                    ->storeDisk('pegawai_photo') // Simpan ke storage disk yang sudah dibuat
+                    ->disk('pegawai_photo') // Gunakan disk yang dikonfigurasi di filesystems.php
+                    ->directory('') // Hindari pembuatan folder tambahan
+                    ->getUploadedFileNameForStorageUsing(fn ($file) => uniqid() . '.' . $file->getClientOriginalExtension()) // Hanya simpan nama file
+                    ->storeFileNamesIn('photo') // Pastikan hanya menyimpan nama file di database
                     ->required(),
                 Forms\Components\TextInput::make('no_ktp')
                     ->label('Nomor KTP')
@@ -320,8 +322,12 @@ class PegawaiResource extends Resource
                 Tables\Columns\TextColumn::make('dankes')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('photo')
-                    ->searchable(),
+                Tables\Columns\ImageColumn::make('photo')
+                    ->label('Foto Pegawai')
+                    ->circular()
+                    ->size(50)
+                    ->url(fn ($record) => url('/webapps/pages/pegawai/photo/' . basename($record->photo))),
+
                 Tables\Columns\TextColumn::make('no_ktp')
                     ->searchable(),
             ])

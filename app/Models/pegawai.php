@@ -122,4 +122,25 @@ class Pegawai extends Model
         return $this->belongsTo(bank::class, 'bank', 'namabank');
     }
 
+    public function setPhotoAttribute($value)
+{
+    if (is_array($value)) {
+        // Jika $value berupa array, ambil elemen pertama (karena single upload)
+        $value = reset($value);
+    }
+
+    $this->attributes['photo'] = 'pages/pegawai/photo/' . $value;
+}
+
+public function dokter()
+    {
+        return $this->hasOne(Dokter::class, 'kd_dokter', 'nik');
+    }
+
+public function petugas()
+    {
+        return $this->hasOne(petugas::class, 'nip', 'nik');
+    }
+
+
 }
