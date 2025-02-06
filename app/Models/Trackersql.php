@@ -8,15 +8,11 @@ class Trackersql extends Model
 {
     protected $table = 'trackersql';
 
+    // Gunakan custom virtual primary key
+    protected $primaryKey = 'custom_key';
 
-    // Primary key tidak di-increment otomatis
     public $incrementing = false;
-
-    // protected $primaryKey = null;
-
     public $timestamps = false;
-
-    // Atur tipe data virtual primary key
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -24,6 +20,19 @@ class Trackersql extends Model
         'sqle',
         'usere',
     ];
+
+    // Tambahkan atribut custom key
+    protected $appends = ['custom_key'];
+
+    public function getCustomKeyAttribute(): string
+    {
+        return (string) implode('_', [$this->tanggal, $this->usere]);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'custom_key';
+    }
 
     protected $casts = [
         'tanggal' => 'date',

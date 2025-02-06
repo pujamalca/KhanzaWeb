@@ -11,8 +11,8 @@ class Tracker extends Model
 
     protected $table = 'tracker';
 
-    // Set primary key menjadi array
-    protected $primaryKey = ['nip', 'tgl_login', 'jam_login'];
+    // Tetapkan primary key menjadi custom string key
+    protected $primaryKey = 'custom_key';
 
     public $incrementing = false;
     public $timestamps = false;
@@ -23,6 +23,19 @@ class Tracker extends Model
         'tgl_login',
         'jam_login',
     ];
+
+    // Tambahkan atribut custom key
+    protected $appends = ['custom_key'];
+
+    public function getCustomKeyAttribute(): string
+    {
+        return (string) implode('_', [$this->nip, $this->tgl_login, $this->jam_login]);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'custom_key';
+    }
 
     protected $casts = [
         'tgl_login' => 'date',

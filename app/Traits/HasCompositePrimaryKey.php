@@ -7,27 +7,45 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasCompositePrimaryKey
 {
+    /**
+     * Set keys for save query (override default Eloquent behavior)
+     */
     protected function setKeysForSaveQuery($query)
     {
-        foreach ($this->getKeyName() as $key) {
+        foreach ((array) $this->getPrimaryKeys() as $key) {
             $query->where($key, '=', $this->getAttribute($key));
         }
         return $query;
     }
 
-    public function getKeyName()
-{
-    return is_array($this->primaryKey) ? implode('_', $this->primaryKey) : $this->primaryKey;
-}
+    /**
+     * Get composite primary keys
+     */
+    public function getPrimaryKeys(): array
+    {
+        return ['nip', 'tgl_login', 'jam_login'];
+    }
 
+    /**
+     * Override getKeyName() to return custom composite key
+     */
+    public function getKeyName(): string
+    {
+        return 'custom_key';
+    }
 
-
-    public function getIncrementing()
+    /**
+     * Override getIncrementing() to always return false
+     */
+    public function getIncrementing(): bool
     {
         return false;
     }
 
-    public function getKeyType()
+    /**
+     * Override getKeyType() to always return string
+     */
+    public function getKeyType(): string
     {
         return 'string';
     }

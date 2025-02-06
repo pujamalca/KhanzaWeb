@@ -112,6 +112,12 @@ class TrackersqlResource extends Resource
             ]);
     }
 
+    public static function getTableRecordKey($record): string
+{
+    return $record->custom_key;
+}
+
+
     public function scopeFilterByDateRange($query, $startDate, $endDate)
     {
         $startDateFormatted = \Carbon\Carbon::createFromFormat('d F Y', $startDate)->startOfDay();
