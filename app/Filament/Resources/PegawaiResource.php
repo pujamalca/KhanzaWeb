@@ -134,13 +134,7 @@ class PegawaiResource extends Resource
                     })
                     ->required(),
                     TextInput::make('npwp')
-                    ->label('NPWP')
-                    ->numeric()
-                    ->minLength(15)
-                    ->maxLength(15)
-                    ->rule(['nullable', 'numeric', 'digits:15']) // ✅ Perbaiki format validasi
-                    ->placeholder('Masukkan 15 digit NPWP')
-                    ->mask('999999999999999')
+                    ->label('NPWP')// ✅ Perbaiki format validasi
                     ->live(),
 
                 // Di dalam form builder

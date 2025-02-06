@@ -17,8 +17,10 @@ class Pegawai extends Model
         'indek' => 0,
         'cuti_diambil' => 0,
         'dankes' => 0,
-        'npwp' => 0,
+        'npwp' => '00',
     ];
+
+
 
     protected $casts = [
         'wajibmasuk' => 'string',
