@@ -113,6 +113,11 @@ class TrackerResource extends Resource
             //
         ];
     }
+    public static function getTableRecordKey($record): string
+{
+    return implode('_', [$record->nip, $record->tgl_login, $record->jam_login]);
+}
+
 
     public function scopeFilterByDateRange($query, $startDate, $endDate)
     {

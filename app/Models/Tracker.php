@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasCompositePrimaryKey;
 
 class Tracker extends Model
 {
+    use HasCompositePrimaryKey;
+
     protected $table = 'tracker';
 
-    // Primary key tidak di-increment otomatis
+    // Set primary key menjadi array
+    protected $primaryKey = ['nip', 'tgl_login', 'jam_login'];
+
     public $incrementing = false;
-
     public $timestamps = false;
-
-    // Atur tipe data virtual primary key
     protected $keyType = 'string';
 
     protected $fillable = [
