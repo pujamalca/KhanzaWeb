@@ -125,27 +125,27 @@ class CustomLogin extends Login
         ]);
     }
 
-    public function logout()
-{
-    $user = Filament::auth()->user();
+//     public function logout()
+// {
+//     $user = Filament::auth()->user();
 
-    if ($user) {
-        Log::info("🚀 LOGOUT DIPANGGIL untuk User ID: {$user->id}");
+//     if ($user) {
+//         Log::info("🚀 LOGOUT DIPANGGIL untuk User ID: {$user->id}");
 
-        // Paksa update last_session_id ke NULL
-        DB::table('users')->where('id', $user->id)->update(['last_session_id' => null]);
+//         // Paksa update last_session_id ke NULL
+//         DB::table('users')->where('id', $user->id)->update(['last_session_id' => null]);
 
-        Log::info("✅ Query Update Logout berhasil.");
+//         Log::info("✅ Query Update Logout berhasil.");
 
-        Filament::auth()->logout();
-        session()->invalidate();
-        session()->regenerateToken();
+//         Filament::auth()->logout();
+//         session()->invalidate();
+//         session()->regenerateToken();
 
-        Log::info("🎯 Logout berhasil.");
-    } else {
-        Log::error("❌ Tidak ada user yang login saat logout.");
-    }
-}
+//         Log::info("🎯 Logout berhasil.");
+//     } else {
+//         Log::error("❌ Tidak ada user yang login saat logout.");
+//     }
+// }
 
 
 

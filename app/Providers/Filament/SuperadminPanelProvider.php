@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
 use App\Filament\Auth\CustomLogin;
+use App\Http\Controllers\Auth\CustomLogoutController;
 use Filament\Navigation\UserMenuItem;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
@@ -37,6 +38,7 @@ class SuperadminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->favicon('/fadhila.png') // Tambahkan favicon di sini
             ->login(CustomLogin::class)
+            // ->logout(CustomLogoutController::class)
             // ->userMenuItems([
             //     UserMenuItem::make()
             //         ->label('Profile') // Label untuk menu
