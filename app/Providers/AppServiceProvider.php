@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Trackersql;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
 
         // Mendaftarkan event dan listener di sini
         Event::listen(

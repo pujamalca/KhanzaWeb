@@ -25,7 +25,10 @@ class LogDatabaseQuery
             // Escape karakter khusus pada binding
             $binding = is_string($binding) ? "'$binding'" : $binding;
             // Gantikan tanda ? dengan binding yang sesuai
-            $query = preg_replace('/\?/', $binding, $query, 1);
+            if (!is_null($binding)) {
+                $query = preg_replace('/\?/', $binding, $query, 1);
+            }
+            
         }
 
         // Cek apakah query adalah `INSERT`, `UPDATE`, atau `DELETE`

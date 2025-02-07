@@ -11,6 +11,10 @@ use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class CustomLogin extends Login
 {
@@ -49,8 +53,33 @@ class CustomLogin extends Login
             ]);
         }
 
-        session()->regenerate();
+        
 
+        // Cek apakah pengguna sudah login di perangkat lain
+        if ($user->last_session_id && $user->last_session_id !== session()->getId()) {
+            // Kirim notifikasi langsung ke user
+            if ($user instanceof \App\Models\User) {
+                $user->notify(new \App\Notifications\MultipleLoginAlert());
+            } else {
+                Log::error("Error: User is not an instance of App\Models\User");
+            }
+            
+        
+            Filament::auth()->logout();
+            session()->invalidate();
+            throw ValidationException::withMessages([
+                'email' => __('Akun Anda telah login di perangkat lain!'),
+            ]);
+        }
+
+    \App\Models\User::where('id', $user->id)->update(['last_session_id' => session()->getId()]);
+    // Kirim notifikasi login sukses
+    Notification::make()
+        ->title('Login Berhasil')
+        ->body('Anda berhasil masuk ke sistem.')
+        ->success()
+        ->send();
+        session()->regenerate();
         return app(LoginResponse::class);
     }
 
@@ -95,6 +124,38 @@ class CustomLogin extends Login
             'data.login' => __('filament-panels::pages/auth/login.messages.failed'),
         ]);
     }
+
+    public function logout()
+{
+    $user = Filament::auth()->user();
+
+    if ($user) {
+        Log::info("🚀 LOGOUT DIPANGGIL untuk User ID: {$user->id}");
+
+        // Paksa update last_session_id ke NULL
+        DB::table('users')->where('id', $user->id)->update(['last_session_id' => null]);
+
+        Log::info("✅ Query Update Logout berhasil.");
+
+        Filament::auth()->logout();
+        session()->invalidate();
+        session()->regenerateToken();
+
+        Log::info("🎯 Logout berhasil.");
+    } else {
+        Log::error("❌ Tidak ada user yang login saat logout.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
 }
 
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->nullable();
+            $table->string('last_session_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

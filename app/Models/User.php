@@ -4,16 +4,20 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
 use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Cache;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        return $this->is_active; // Sesuaikan dengan logika akses panel Anda
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -25,6 +29,7 @@ class User extends Authenticatable
         'email',
         'is_active',
         'password',
+        'last_session_id',
     ];
 
     protected $casts = [
@@ -52,5 +57,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Nonaktifkan cache sementara
+    public static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($user) {
+            Cache::forget("user_{$user->id}_session");
+        });
     }
 }
