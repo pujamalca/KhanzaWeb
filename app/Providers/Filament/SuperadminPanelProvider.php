@@ -21,6 +21,8 @@ use Filament\FilamentServiceProvider as BaseFilamentServiceProvider;
 use Filament\Facades\Filament;
 use App\Filament\Auth\CustomLogin;
 use App\Http\Controllers\Auth\CustomLogoutController;
+use App\Filament\Pages\Settings;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\UserMenuItem;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
@@ -39,12 +41,9 @@ class SuperadminPanelProvider extends PanelProvider
             ->favicon('/fadhila.png') // Tambahkan favicon di sini
             ->login(CustomLogin::class)
             // ->logout(CustomLogoutController::class)
-            // ->userMenuItems([
-            //     UserMenuItem::make()
-            //         ->label('Profile') // Label untuk menu
-            //         ->url(route('App.Filament.Pages.Profile')) // URL menuju halaman profil
-            //         ->icon('heroicon-o-user'), // Ikon menu
-            // ])
+            ->userMenuItems([
+                'logout' => MenuItem::make()->label('Log out'),
+            ])
             // ->sidebar()
             // ->notifications()
             //Ganti Warna

@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -58,6 +59,13 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
         ];
     }
+
+    
+
+public function isAlreadyLoggedIn(): bool
+{
+    return $this->last_session_id && $this->last_session_id !== Session::getId();
+}
 
     // Nonaktifkan cache sementara
     public static function boot()

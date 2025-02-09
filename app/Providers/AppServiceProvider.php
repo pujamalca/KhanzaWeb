@@ -13,6 +13,11 @@ use App\Models\Trackersql;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Filament\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\CustomLogoutController;
+use Filament\Pages\Auth\Login as LoginController;
+use App\Filament\Auth\CustomLogin as CustomLoginController;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        $this->app->bind(LogoutController::class, CustomLogoutController::class);
+        $this->app->bind(LoginController::class, CustomLoginController::class);
+
     }
 
     /**

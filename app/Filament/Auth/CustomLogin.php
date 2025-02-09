@@ -3,7 +3,6 @@
 namespace App\Filament\Auth;
 
 use Filament\Pages\Auth\Login;
-
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Validation\ValidationException;
@@ -12,9 +11,9 @@ use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Session;
+use App\Models\User;
 
 class CustomLogin extends Login
 {
@@ -24,62 +23,66 @@ class CustomLogin extends Login
             $this->rateLimit(5);
         } catch (TooManyRequestsException $exception) {
             $this->getRateLimitedNotification($exception)?->send();
-
             return null;
         }
 
         $data = $this->form->getState();
 
-        if (! Filament::auth()->attempt($this->getCredentialsFromFormData($data), $data['remember'] ?? false)) {
+        if (!Filament::auth()->attempt($this->getCredentialsFromFormData($data), $data['remember'] ?? false)) {
             $this->throwFailureValidationException();
         }
 
         $user = Filament::auth()->user();
 
-        if (
-            ($user instanceof FilamentUser) &&
-            (! $user->canAccessPanel(Filament::getCurrentPanel()))
-        ) {
+        // Cek apakah user dapat mengakses panel Filament
+        if ($user instanceof FilamentUser && !$user->canAccessPanel(Filament::getCurrentPanel())) {
             Filament::auth()->logout();
-
             $this->throwFailureValidationException();
-        } elseif (
-            $user->is_active === false
-        ) {
-            Filament::auth()->logout();
+        }
 
+        // Cek apakah user aktif
+        if ($user->is_active === false) {
+            Filament::auth()->logout();
             throw ValidationException::withMessages([
                 'data.login' => 'Akun tidak aktif, hubungi Administrator!',
             ]);
         }
 
-        
-
         // Cek apakah pengguna sudah login di perangkat lain
-        if ($user->last_session_id && $user->last_session_id !== session()->getId()) {
-            // Kirim notifikasi langsung ke user
+        if ($user->last_session_id && $user->last_session_id !== Session::getId()) {
+            Log::warning("User ID: {$user->id} mencoba login di perangkat lain.");
+
+            // Kirim notifikasi ke user
             if ($user instanceof \App\Models\User) {
                 $user->notify(new \App\Notifications\MultipleLoginAlert());
             } else {
                 Log::error("Error: User is not an instance of App\Models\User");
             }
-            
-        
+
             Filament::auth()->logout();
             session()->invalidate();
+
             throw ValidationException::withMessages([
-                'email' => __('Akun Anda telah login di perangkat lain!'),
+                'data.login' => __('Akun Anda telah login di perangkat lain!'),
             ]);
         }
 
-    \App\Models\User::where('id', $user->id)->update(['last_session_id' => session()->getId()]);
-    // Kirim notifikasi login sukses
-    Notification::make()
-        ->title('Login Berhasil')
-        ->body('Anda berhasil masuk ke sistem.')
-        ->success()
-        ->send();
+        // Simpan session_id baru agar lebih aman
+            if ($user instanceof User) {
+                $user->update(['last_session_id' => Session::getId()]);
+            } else {
+                Log::error("❌ User bukan instance dari User model: " . get_class($user));
+            }
+        // Regenerasi session agar lebih aman
         session()->regenerate();
+
+        // Kirim notifikasi login sukses
+        Notification::make()
+            ->title('Login Berhasil')
+            ->body('Anda berhasil masuk ke sistem.')
+            ->success()
+            ->send();
+
         return app(LoginResponse::class);
     }
 
@@ -125,39 +128,25 @@ class CustomLogin extends Login
         ]);
     }
 
-//     public function logout()
-// {
-//     $user = Filament::auth()->user();
+    public function logout()
+    {
+        $user = Filament::auth()->user();
 
-//     if ($user) {
-//         Log::info("🚀 LOGOUT DIPANGGIL untuk User ID: {$user->id}");
+        if ($user instanceof User) {
+            Log::info("🚀 LOGOUT DIPANGGIL untuk User ID: {$user->id}");
 
-//         // Paksa update last_session_id ke NULL
-//         DB::table('users')->where('id', $user->id)->update(['last_session_id' => null]);
+            // Paksa update last_session_id ke NULL
+            $user->update(['last_session_id' => null]);
 
-//         Log::info("✅ Query Update Logout berhasil.");
+            Log::info("✅ Query Update Logout berhasil.");
 
-//         Filament::auth()->logout();
-//         session()->invalidate();
-//         session()->regenerateToken();
+            Filament::auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
 
-//         Log::info("🎯 Logout berhasil.");
-//     } else {
-//         Log::error("❌ Tidak ada user yang login saat logout.");
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
+            Log::info("🎯 Logout berhasil.");
+        } else {
+            Log::error("❌ Tidak ada user yang login atau user bukan instance dari User model.");
+        }
+    }
 }
-
-
-
-
