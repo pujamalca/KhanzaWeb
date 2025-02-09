@@ -90,9 +90,7 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->configure(function (Table $table) {
-                $table->container()->class('w-full'); // Tambahkan ini
-            })
+            
             ->filters([
                 //
                 Tables\Filters\Filter::make('verified')

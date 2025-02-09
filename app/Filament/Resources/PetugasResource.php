@@ -145,24 +145,42 @@ class PetugasResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nip')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->label('NIP'),
                 Tables\Columns\TextColumn::make('nama')
+                    ->sortable()
+                    ->searchable()
+                    ->label('Nama'),
+                Tables\Columns\TextColumn::make('jk')
+                    ->label('Jenis Kelamin')
+                    ->formatStateUsing(fn ($state) => $state === 'L' ? 'Laki-Laki' : ($state === 'P' ? 'Perempuan' : '-'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('jk'),
                 Tables\Columns\TextColumn::make('tmp_lahir')
-                    ->searchable(),
+                    ->label('Tempat Lahir')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tgl_lahir')
+                    ->label('Tanggal Lahir')
                     ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('gol_darah'),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('gol_darah')
+                    ->label('Golongan Darah'),
                 Tables\Columns\TextColumn::make('agama')
+                    ->label('Agama')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('stts_nikah'),
+                Tables\Columns\TextColumn::make('stts_nikah')
+                    ->label('Status')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('alamat')
+                    ->label('Alamat')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('kd_jbtn')
+                Tables\Columns\TextColumn::make('jabatan.nm_jbtn')
+                    ->label('Jabatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('no_telp')
+                    ->label('No HP')
                     ->searchable(),
                 // Menampilkan status sebagai ikon centang dan X
                 BooleanColumn::make('status')

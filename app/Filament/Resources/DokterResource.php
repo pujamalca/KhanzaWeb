@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -164,29 +165,56 @@ class DokterResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kd_dokter')->searchable(),
-                Tables\Columns\TextColumn::make('nm_dokter')->searchable(),
+                Tables\Columns\TextColumn::make('kd_dokter')
+                ->searchable()
+                ->sortable()
+                ->label('Kode Dokter'),
+                Tables\Columns\TextColumn::make('nm_dokter')
+                ->sortable()
+                ->searchable()
+                ->label('Nama Dokter'),
 
                 // Konversi 'P' dan 'L' menjadi teks yang lebih informatif
                 Tables\Columns\TextColumn::make('jk')
                     ->label('Jenis Kelamin')
                     ->formatStateUsing(fn ($state) => $state === 'P' ? 'Perempuan' : 'Laki-laki'),
 
-                Tables\Columns\TextColumn::make('tmp_lahir')->searchable(),
-                Tables\Columns\TextColumn::make('tgl_lahir')->date()->sortable(),
-                Tables\Columns\TextColumn::make('gol_drh'),
-                Tables\Columns\TextColumn::make('agama')->searchable(),
-                Tables\Columns\TextColumn::make('almt_tgl')->searchable(),
-                Tables\Columns\TextColumn::make('no_telp')->searchable(),
-                Tables\Columns\TextColumn::make('stts_nikah'),
+                Tables\Columns\TextColumn::make('tmp_lahir')
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault: true)
+                ->label('Tempat Lahir'),
+                Tables\Columns\TextColumn::make('tgl_lahir')
+                ->label('Tanggal Lahir')
+                ->date()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('gol_drh')
+                ->label('Golongan Darah'),
+                Tables\Columns\TextColumn::make('agama')
+                ->label('Agama')
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('almt_tgl')
+                ->label('Alamat')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('no_telp')
+                ->label('No HP')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('stts_nikah')
+                ->label('Status')
+                ->toggleable(isToggledHiddenByDefault: true),
 
                 // Menampilkan nama spesialis di tabel, bukan kode
                 Tables\Columns\TextColumn::make('spesialis.nm_sps')
                     ->label('Spesialis')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('alumni')->searchable(),
-                Tables\Columns\TextColumn::make('no_ijn_praktek')->searchable(),
+                Tables\Columns\TextColumn::make('alumni')
+                ->label('Alumni')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('no_ijn_praktek')
+                ->label('SIP')
+                ->searchable(),
 
                 // Menampilkan status sebagai ikon centang dan X
                 BooleanColumn::make('status')
@@ -197,8 +225,9 @@ class DokterResource extends Resource
                     ->falseColor('danger'),
             ])
             ->filters([
-                //
+               
             ])
+            ->defaultSort('nm_dokter', 'asc')
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

@@ -249,80 +249,140 @@ class PegawaiResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nik')
+                    ->label('NIK')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
+                    ->label('Nama')
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('jk'),
+                Tables\Columns\TextColumn::make('jk')
+                    ->label('Jenis Kelamin')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('jbtn')
+                    ->label('Jabatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jnj_jabatan')
+                    ->label('Jenjang Jabatan')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kode_kelompok')
+                    ->label('Kode Kelompok')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kode_resiko')
+                    ->label('Kode Resiko')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kode_emergency')
+                    ->label('Kode Emergency')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('departemen')
+                    ->label('Departemen')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('bidang')
+                    ->label('Bidang')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('stts_wp')
+                    ->label('Status Wajib Pajak')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('stts_kerja')
+                    ->label('Status Kerja')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('npwp')
+                    ->label('NPWP')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('pendidikan')
+                    ->label('Pendidikan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('gapok')
+                    ->label('Gaji Pokok')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tmp_lahir')
+                    ->label('Tempat Lahir')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_lahir')
+                    ->label('Tanggal Lahir')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('alamat')
+                    ->label('Alamat')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kota')
+                    ->label('Kota')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('mulai_kerja')
+                    ->label('Mulai Kerja')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ms_kerja'),
+                Tables\Columns\TextColumn::make('ms_kerja')
+                    ->label('Masa Kerja')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('indexins')
+                    ->label('Index')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('bpd')
+                    ->label('Bank')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('rekening')
+                    ->label('Rekening')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('stts_aktif'),
+                Tables\Columns\TextColumn::make('stts_aktif')
+                    ->label('Aktif')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('wajibmasuk')
+                    ->label('Wajib Masuk')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pengurang')
+                    ->label('Pengurang')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('indek')
+                    ->label('Indek')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('mulai_kontrak')
+                    ->label('Mulai Kontrak')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('cuti_diambil')
+                    ->label('Cuti Diambil')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('dankes')
+                    ->label('Dankes')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('photo')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Foto Pegawai')
                     ->circular()
                     ->size(50)
                     ->url(fn ($record) => url('/webapps/pages/pegawai/photo/' . basename($record->photo))),
 
                 Tables\Columns\TextColumn::make('no_ktp')
+                    ->label('No KTP')
+                    ->sortable()
                     ->searchable(),
             ])
             ->filters([
