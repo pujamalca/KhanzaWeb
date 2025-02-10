@@ -118,12 +118,36 @@ class DokterResource extends Resource
                     ->searchable()
                     ->required(),
 
-                Select::make('kd_sps')
+                    Select::make('kd_sps')
                     ->label('Spesialis')
                     ->options(
-                        \App\Models\Spesialis::pluck('nm_sps', 'kd_sps')
+                        \App\Models\Spesialis::orderBy('kd_sps', 'asc') // Pastikan urutan ASC
+                            ->pluck('nm_sps', 'kd_sps')
+                            ->map(fn($nm_sps, $kd_sps) => "$kd_sps - $nm_sps") // Format: S0001 - Nama Spesialis
                     )
                     ->searchable()
+                    ->placeholder('Pilih Spesialis')
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kd_sps')
+                            ->label('Kode Spesialis')
+                            ->required()
+                            ->unique('spesialis', 'kd_sps'),
+
+                        Forms\Components\TextInput::make('nm_sps')
+                            ->label('Nama Spesialis')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_spesialis')
+                            ->label('Data Spesialis')
+                            ->default(
+                                \App\Models\Spesialis::orderBy('kd_sps', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nm_sps', 'kd_sps')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
 
                 Forms\Components\TextInput::make('alumni')
@@ -225,7 +249,7 @@ class DokterResource extends Resource
                     ->falseColor('danger'),
             ])
             ->filters([
-               
+
             ])
             ->defaultSort('nm_dokter', 'asc')
             ->actions([

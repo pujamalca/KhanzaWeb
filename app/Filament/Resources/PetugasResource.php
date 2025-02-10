@@ -109,9 +109,31 @@ class PetugasResource extends Resource
                 Select::make('kd_jbtn')
                     ->label('Jabatan')
                     ->options(
-                        \App\Models\jabatan::pluck('nm_jbtn', 'kd_jbtn')
+                        \App\Models\jabatan::orderBy('kd_jbtn', 'asc') // Pastikan urutan ASC
+                            ->pluck('nm_jbtn', 'kd_jbtn')
+                            ->map(fn($nm_jbtn, $kd_jbtn) => "$kd_jbtn - $nm_jbtn") // Format: S0001 - Nama Spesialis
                     )
                     ->searchable()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kd_jbtn')
+                            ->label('Kode jabatan')
+                            ->required()
+                            ->unique('jabatan', 'kd_jbtn'),
+
+                        Forms\Components\TextInput::make('nm_jbtn')
+                            ->label('Nama jabatan')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_jabatan')
+                            ->label('Data jabatan')
+                            ->default(
+                                \App\Models\jabatan::orderBy('kd_jbtn', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nm_jbtn', 'kd_jbtn')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                 Toggle::make('status')
                     ->label('Status')
