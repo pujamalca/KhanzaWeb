@@ -73,8 +73,28 @@ class PegawaiResource extends Resource
                     ->label('Jenjang Jabatan')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel jnj_jabatan
-                        return jnj_jabatan::all()->pluck('nama', 'kode');
+                        return jnj_jabatan::all()->pluck('nama', 'kode',);
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kode')
+                            ->label('Kode jabatan')
+                            ->required()
+                            ->unique('jnj_jabatan', 'kode'),
+
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Nama jabatan')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_jabatan')
+                            ->label('Data jabatan')
+                            ->default(
+                                \App\Models\jnj_jabatan::orderBy('kode', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama', 'kode')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required() // Field ini wajib diisi
                     ->placeholder('Pilih Jabatan'),
                 Forms\Components\select::make('kode_kelompok')
@@ -83,6 +103,26 @@ class PegawaiResource extends Resource
                         // Ambil semua jabatan dari tabel
                         return kelompok_jabatan::all()->pluck('nama_kelompok', 'kode_kelompok');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kode_kelompok')
+                            ->label('Kode Kelompok')
+                            ->required()
+                            ->unique('jnj_jabatan', 'kode_kelompok'),
+
+                        Forms\Components\TextInput::make('nama_kelompok')
+                            ->label('Nama Kelompok')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_kelompok')
+                            ->label('Data Kelompok')
+                            ->default(
+                                \App\Models\kelompok_jabatan::orderBy('kode_kelompok', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama_kelompok', 'kode_kelompok')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                 Forms\Components\select::make('kode_resiko')
                     ->label('Kode Resiko')
@@ -90,6 +130,26 @@ class PegawaiResource extends Resource
                         // Ambil semua jabatan dari tabel
                         return resiko_kerja::all()->pluck('nama_resiko', 'kode_resiko');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kode_resiko')
+                            ->label('Kode Resiko')
+                            ->required()
+                            ->unique('resiko_kerja', 'kode_resiko'),
+
+                        Forms\Components\TextInput::make('nama_resiko')
+                            ->label('Nama Resiko')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_resiko')
+                            ->label('Data Resiko')
+                            ->default(
+                                \App\Models\resiko_kerja::orderBy('kode_resiko', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama_resiko', 'kode_resiko')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                 Forms\Components\select::make('kode_emergency')
                     ->label('Kode Emergency')
@@ -97,11 +157,51 @@ class PegawaiResource extends Resource
                         // Ambil semua jabatan dari tabel
                         return emergency_index::all()->pluck('nama_emergency', 'kode_emergency');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('kode_emergency')
+                            ->label('Kode Emergency')
+                            ->required()
+                            ->unique('emergency_index', 'kode_emergency'),
+
+                        Forms\Components\TextInput::make('nama_emergency')
+                            ->label('Nama Emergency')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_emergency')
+                            ->label('Data Emergency')
+                            ->default(
+                                \App\Models\emergency_index::orderBy('kode_emergency', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama_emergency', 'kode_emergency')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                     Select::make('departemen')
                     ->label('Pilih Departemen')
                     ->options(Departemen::pluck('nama', 'dep_id')) // Pastikan nama kolom benar
                     ->searchable()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('dep_id')
+                            ->label('Departemen ID')
+                            ->required()
+                            ->unique('departemen', 'dep_id'),
+
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Nama ')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_emergency')
+                            ->label('Data Departemen')
+                            ->default(
+                                \App\Models\departemen::orderBy('dep_id', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama', 'dep_id')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('indexins', $state)) // Set indexins sesuai departemen
                     ->required(),
@@ -109,11 +209,27 @@ class PegawaiResource extends Resource
                 Hidden::make('indexins') // Menyembunyikan indexins, tapi tetap tersimpan
                     ->default(fn ($get) => $get('departemen')),
                 Forms\Components\select::make('bidang')
-                    ->label('bidang')
+                    ->label('Bidang')
                     ->options(function () {
                         // Ambil semua jabatan dari tabel
                         return bidang::all()->pluck('nama', 'nama');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Bidang')
+                            ->required()
+                            ->unique('bidang', 'nama'),
+
+                        Forms\Components\KeyValue::make('list_bidang')
+                            ->label('Data Bidang')
+                            ->default(
+                                \App\Models\bidang::orderBy('nama', 'asc') // Pastikan urutan ASC
+                                    ->pluck('nama')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                 Forms\Components\select::make('stts_wp')
                     ->label('Status Wajib Pajak')
@@ -123,6 +239,26 @@ class PegawaiResource extends Resource
                         ->select(DB::raw("CONCAT(stts, ' - ', ktg) as label, stts"))
                         ->pluck('label', 'stts');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('stts')
+                            ->label('Kode')
+                            ->required()
+                            ->unique('stts_wp', 'stts'),
+
+                        Forms\Components\TextInput::make('ktg')
+                            ->label('Nama ')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_emergency')
+                            ->label('Data Departemen')
+                            ->default(
+                                \App\Models\stts_wp::orderBy('stts', 'asc') // Pastikan urutan ASC
+                                    ->pluck('ktg', 'stts')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                 Forms\Components\select::make('stts_kerja')
                     ->label('Status Kerja')
@@ -132,6 +268,26 @@ class PegawaiResource extends Resource
                         ->select(DB::raw("CONCAT(stts, ' - ', ktg) as label, stts"))
                         ->pluck('label', 'stts');
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('stts')
+                            ->label('Kode')
+                            ->required()
+                            ->unique('stts_kerja', 'stts'),
+
+                        Forms\Components\TextInput::make('ktg')
+                            ->label('Nama ')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_emergency')
+                            ->label('Data Departemen')
+                            ->default(
+                                \App\Models\stts_kerja::orderBy('stts', 'asc') // Pastikan urutan ASC
+                                    ->pluck('ktg', 'stts')
+                                    ->toArray()
+                            )
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
                     ->required(),
                     TextInput::make('npwp')
                     ->label('NPWP')// ✅ Perbaiki format validasi
