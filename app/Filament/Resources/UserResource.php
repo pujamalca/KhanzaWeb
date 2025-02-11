@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\Pegawai;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -37,13 +39,33 @@ class UserResource extends Resource
             ->schema([
                 Card::make()
                     ->schema([
+                Select::make('pegawai_id')
+                        ->label('Pilih Pegawai')
+                        ->placeholder('Ambil dari data pegawai')
+                        ->options(
+                            Pegawai::all()->mapWithKeys(function ($pegawai) {
+                                return [$pegawai->id => "{$pegawai->nik} - {$pegawai->nama}"];
+                            })->toArray()
+                        )
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->afterStateUpdated(fn ($state, callable $set) => self::updateUserData($state, $set)), // Update fields otomatis
+
+
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                        ->label('Nama')
+                        ->required()
+                        ->maxLength(255)
+                        ->disabled(),
+
                 Forms\Components\TextInput::make('username')
-                    ->required()
-                    ->maxLength(255),
+                        ->label('NIK')
+                        ->required()
+                        ->maxLength(255)
+                        ->disabled(),
                 Forms\Components\TextInput::make('email')
+                    ->label('Email')
                     ->email()
                     ->required()
                     ->maxLength(255),
@@ -54,6 +76,7 @@ class UserResource extends Resource
                     ->offColor('danger')
                     ->inline(),
                 Forms\Components\TextInput::make('password')
+                    ->label('Password')
                     ->password()
                     ->required()
                     ->maxLength(255)
@@ -64,15 +87,31 @@ class UserResource extends Resource
             ]);
     }
 
+    private static function updateUserData($pegawaiId, callable $set)
+    {
+        if (!$pegawaiId) {
+            return;
+        }
+
+        $pegawai = Pegawai::find($pegawaiId);
+        if ($pegawai) {
+            $set('name', $pegawai->nama);
+            $set('username', $pegawai->nik);
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('username')
+                    ->label('NIK')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->sortable()
@@ -90,7 +129,7 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            
+
             ->filters([
                 //
                 Tables\Filters\Filter::make('verified')
