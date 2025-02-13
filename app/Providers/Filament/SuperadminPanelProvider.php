@@ -22,6 +22,7 @@ use Filament\Facades\Filament;
 use App\Filament\Auth\CustomLogin;
 use App\Http\Controllers\Auth\CustomLogoutController;
 use App\Filament\Pages\Settings;
+use App\Http\Middleware\AutoLogout;
 use Filament\Navigation\MenuItem;
 use Filament\Navigation\UserMenuItem;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
@@ -69,10 +70,13 @@ class SuperadminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                AutoLogout::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
+                AutoLogout::class,
             ])
+            ->routes(fn() => [])
             ->plugins([
                 SpotlightPlugin::make(),
             ]);;

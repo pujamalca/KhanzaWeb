@@ -309,6 +309,58 @@ class PegawaiResource extends Resource
                         // **Pastikan juga menyimpan ke gapok (di tabel pegawai)**
                         $set('gapok', $gapok1);
                     })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('tingkat')
+                            ->label('Tingkat')
+                            ->required()
+                            ->unique('pendidikan', 'tingkat'),
+                        Forms\Components\TextInput::make('gapok1')
+                            ->numeric()
+                            ->label('Gapok ')
+                            ->required(),
+                        Forms\Components\TextInput::make('indek')
+                            ->numeric()
+                            ->label('Indek')
+                            ->required(),
+                        Forms\Components\TextInput::make('kenaikan')
+                            ->numeric()
+                            ->label('Kenaikan')
+                            ->required(),
+                        Forms\Components\TextInput::make('maksimal')
+                            ->numeric()
+                            ->label('Maksimal')
+                            ->required(),
+
+                        Forms\Components\KeyValue::make('list_pendidikan')
+                            ->label('Data Pendidikan')
+                            ->default(
+                                \App\Models\Pendidikan::orderBy('tingkat', 'asc')
+                                    ->get(['tingkat', 'gapok1', 'indek', 'kenaikan', 'maksimal'])
+                                    ->mapWithKeys(function ($item) {
+                                        return [$item->tingkat => json_encode([
+                                            'gapok1' => $item->gapok1,
+                                            'indek' => $item->indek,
+                                            'kenaikan' => $item->kenaikan,
+                                            'maksimal' => $item->maksimal,
+                                        ])];
+                                    })
+                                    ->toArray()
+                            )
+
+
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
+                    ->createOptionUsing(function ($data) {
+                        return \App\Models\Pendidikan::create([
+                            'tingkat' => $data['tingkat'],
+                            'gapok1' => $data['gapok1'],
+                            'indek' => $data['indek'] ?? 0, // Pastikan ada nilai default jika tidak diisi
+                            'kenaikan' => $data['kenaikan'] ?? 0, // Pastikan ada nilai default jika tidak diisi
+                            'maksimal' => $data['maksimal'] ?? 0, // Pastikan ada nilai default jika tidak diisi
+                        ]);
+                    })
+
                     ->native(false),
 
                 TextInput::make('gapok1')

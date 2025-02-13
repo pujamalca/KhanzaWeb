@@ -17,7 +17,8 @@ use Filament\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\CustomLogoutController;
 use Filament\Pages\Auth\Login as LoginController;
 use App\Filament\Auth\CustomLogin as CustomLoginController;
-
+use App\Http\Middleware\AutoLogout;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Route::middleware([AutoLogout::class])->group(base_path('routes/web.php'));
+
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }
