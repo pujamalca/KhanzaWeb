@@ -18,9 +18,13 @@ use App\Models\stts_wp;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Livewire;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Pages\Actions\Modal\Actions\ButtonAction;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,6 +32,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
 
 class PegawaiResource extends Resource
 {
@@ -45,6 +50,8 @@ class PegawaiResource extends Resource
 
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Pegawai';
+
+    protected $listeners = ['refreshComponent' => '$refresh'];
 
     public static function form(Form $form): Form
     {
@@ -82,7 +89,18 @@ class PegawaiResource extends Resource
                             ->unique('jnj_jabatan', 'kode'),
 
                         Forms\Components\TextInput::make('nama')
+                            ->unique('jnj_jabatan', 'nama')
                             ->label('Nama jabatan')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('tnj')
+                            ->numeric()
+                            ->label('Tunjangan')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('indek')
+                            ->numeric()
+                            ->label('indek')
                             ->required(),
 
                         Forms\Components\KeyValue::make('list_jabatan')
@@ -95,6 +113,14 @@ class PegawaiResource extends Resource
                             ->disabled()
                             ->columnSpanFull(),
                     ])
+                    ->createOptionUsing(function ($data) {
+                        return \App\Models\jnj_jabatan::create([
+                            'kode' => $data['kode'],
+                            'nama' => $data['nama'],
+                            'tnj' => $data['tnj'] ?? 0, // Pastikan ada nilai default jika tidak diisi
+                            'indek' => $data['indek'] ?? 0, // Pastikan ada nilai default jika tidak diisi
+                        ]);
+                    })
                     ->required() // Field ini wajib diisi
                     ->placeholder('Pilih Jabatan'),
                 Forms\Components\select::make('kode_kelompok')
@@ -331,10 +357,11 @@ class PegawaiResource extends Resource
                             ->label('Maksimal')
                             ->required(),
 
-                        Forms\Components\KeyValue::make('list_pendidikan')
+                        KeyValue::make('list_pendidikan')
                             ->label('Data Pendidikan')
+                            ->live() // Aktifkan real-time refresh
                             ->default(
-                                \App\Models\Pendidikan::orderBy('tingkat', 'asc')
+                                Pendidikan::orderBy('tingkat', 'asc')
                                     ->get(['tingkat', 'gapok1', 'indek', 'kenaikan', 'maksimal'])
                                     ->mapWithKeys(function ($item) {
                                         return [$item->tingkat => json_encode([
@@ -346,10 +373,36 @@ class PegawaiResource extends Resource
                                     })
                                     ->toArray()
                             )
+                            ->columnSpanFull()
+                            ->deletable(fn ($record) => Notification::make()
+                                ->title('Konfirmasi Penghapusan')
+                                ->body("Apakah Anda yakin ingin menghapus pendidikan ini?")
+                                ->actions([
+                                    ButtonAction::make('delete')
+                                        ->label('Hapus')
+                                        ->color('danger')
+                                        ->action(fn () => $record->delete()),
+                                ])
+                            )
+                            ->afterStateUpdated(function ($state) {
+                                foreach (Pendidikan::pluck('tingkat')->toArray() as $tingkat) {
+                                    if (!array_key_exists($tingkat, $state)) {
+                                        // Cek apakah data ini sudah digunakan di tabel pegawai
+                                        if (\App\Models\Pegawai::where('pendidikan', $tingkat)->exists()) {
+                                            Notification::make()
+                                                ->title('Gagal Menghapus!')
+                                                ->body("Pendidikan dengan tingkat '$tingkat' sedang digunakan oleh pegawai.")
+                                                ->danger()
+                                                ->send();
+                                            continue; // Skip penghapusan jika data masih digunakan
+                                        }
 
+                                        // Hapus data jika tidak digunakan
+                                        Pendidikan::where('tingkat', $tingkat)->delete();
+                                    }
+                                }
+                            }),
 
-                            ->disabled()
-                            ->columnSpanFull(),
                     ])
                     ->createOptionUsing(function ($data) {
                         return \App\Models\Pendidikan::create([
@@ -359,8 +412,11 @@ class PegawaiResource extends Resource
                             'kenaikan' => $data['kenaikan'] ?? 0, // Pastikan ada nilai default jika tidak diisi
                             'maksimal' => $data['maksimal'] ?? 0, // Pastikan ada nilai default jika tidak diisi
                         ]);
-                    })
+                        // Kirim event untuk refresh komponen Livewire
+                        Livewire::emit('refreshComponent');
+                        return $pendidikan;
 
+                    })
                     ->native(false),
 
                 TextInput::make('gapok1')
