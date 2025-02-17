@@ -151,11 +151,11 @@ class UserResource extends Resource
                             ->action(fn (User $record) => $record->update(['last_session_id' => null]))
                             ->requiresConfirmation(),
 
-                        Action::make('reset_password')
+                            Action::make('reset_password')
                             ->label('Reset Password')
                             ->icon('heroicon-o-key')
                             ->color('warning')
-                            ->action(fn (User $record) => $record->update(['password' => bcrypt('defaultpassword')]))
+                            ->action(fn (User $record) => $record->update(['password' => bcrypt($record->username)]))
                             ->requiresConfirmation(),
                     ])->tooltip('Menu')
                     ->icon('heroicon-o-chevron-left'),
@@ -173,6 +173,12 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Action::make('clear_session')
+                            ->label('Clear Session')
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->action(fn (User $record) => $record->update(['last_session_id' => null]))
+                            ->requiresConfirmation(),
                 ]),
             ]);
     }
