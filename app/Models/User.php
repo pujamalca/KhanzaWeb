@@ -60,7 +60,7 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    
+
 
 public function isAlreadyLoggedIn(): bool
 {

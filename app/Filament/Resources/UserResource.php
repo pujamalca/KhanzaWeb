@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -57,13 +58,15 @@ class UserResource extends Resource
                         ->label('Nama')
                         ->required()
                         ->maxLength(255)
-                        ->disabled(),
+                        ->disabled()
+                        ->dehydrated(),
 
                 Forms\Components\TextInput::make('username')
                         ->label('NIK')
                         ->required()
                         ->maxLength(255)
-                        ->disabled(),
+                        ->disabled()
+                        ->dehydrated(),
                 Forms\Components\TextInput::make('email')
                     ->label('Email')
                     ->email()
@@ -113,6 +116,9 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('last_session_id')
+                    ->label('Sesi')
+                    ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->sortable()
                     ->label('Aktif'),
@@ -136,9 +142,34 @@ class UserResource extends Resource
                 ->query(fn (Builder $query): Builder => $query->whereNotNull('email_verified_at')),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ActionGroup::make([
+                        Action::make('clear_session')
+                            ->label('Clear Session')
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->action(fn (User $record) => $record->update(['last_session_id' => null]))
+                            ->requiresConfirmation(),
+
+                        Action::make('reset_password')
+                            ->label('Reset Password')
+                            ->icon('heroicon-o-key')
+                            ->color('warning')
+                            ->action(fn (User $record) => $record->update(['password' => bcrypt('defaultpassword')]))
+                            ->requiresConfirmation(),
+                    ])->tooltip('Menu')
+                    ->icon('heroicon-o-chevron-left'),
+
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+
+
+                ]),
             ])
+
+
+
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
