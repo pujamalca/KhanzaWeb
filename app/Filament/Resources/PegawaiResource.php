@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Illuminate\Support\Str;
 
 class PegawaiResource extends Resource
 {
@@ -485,14 +486,18 @@ class PegawaiResource extends Resource
                     ->helperText('Isi dengan "-" jika ingin wajib masuk 1 bulan-hari libur, dan seterusnya.')
                     ->dehydrateStateUsing(fn ($state) => $state === '-' ? 0 : (int) $state), // Konversi "-" ke 0
                 Forms\Components\DatePicker::make('mulai_kontrak'),
+
                 FileUpload::make('photo')
                     ->label('Foto Pegawai')
-                    ->image()
-                    ->disk('pegawai_photo') // Gunakan disk yang dikonfigurasi di filesystems.php
-                    ->directory('') // Hindari pembuatan folder tambahan
-                    ->getUploadedFileNameForStorageUsing(fn ($file) => uniqid() . '.' . $file->getClientOriginalExtension()) // Hanya simpan nama file
-                    ->storeFileNamesIn('photo') // Pastikan hanya menyimpan nama file di database
+                    ->image() // Hanya menerima file gambar
+                    ->disk('local') // Gunakan disk yang kita buat tadi
+                    ->directory('pegawai_photo') // Simpan di folder pegawai_photo di dalam private
+                    ->getUploadedFileNameForStorageUsing(fn ($file) => 'pages/pegawai/photo/' . Str::random(10) . '.' . $file->getClientOriginalExtension()) // Buat nama file unik
+                    ->storeFileNamesIn('photo') // Hanya simpan path relatif ke database
+                    ->visibility('private') // Pastikan file bersifat private
                     ->required(),
+
+
                 Forms\Components\TextInput::make('no_ktp')
                     ->label('Nomor KTP')
                     ->required()
@@ -638,11 +643,12 @@ class PegawaiResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('photo')
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Foto Pegawai')
                     ->circular()
                     ->size(50)
-                    ->url(fn ($record) => url('/webapps/pages/pegawai/photo/' . basename($record->photo))),
+                    ->getStateUsing(fn ($record) => $record->photo ? url('/pegawai/photo/' . basename($record->photo)) : null),
+
+
 
                 Tables\Columns\TextColumn::make('no_ktp')
                     ->label('No KTP')

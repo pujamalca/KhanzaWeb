@@ -40,10 +40,15 @@ return [
 
         'pegawai_photo' => [
             'driver' => 'local',
-            'root' => 'C:/xampp/htdocs/webapps/pages/pegawai/photo/', // Lokasi penyimpanan
+            'root' => $_ENV['PEGAWAI_PHOTO_PATH'] ?? $_SERVER['PEGAWAI_PHOTO_PATH'] ?? storage_path('app/pegawai_photo'),
             'visibility' => 'public',
         ],
 
+        'livewire-tmp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/livewire-tmp'),
+            'visibility' => 'private',
+        ],
 
         'public' => [
             'driver' => 'local',
