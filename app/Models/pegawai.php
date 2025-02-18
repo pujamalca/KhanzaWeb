@@ -27,6 +27,8 @@ class Pegawai extends Model
     ];
 
 
+
+
     // Kolom yang boleh diisi (mass assignment)
     protected $fillable = [
         'nik',
@@ -63,6 +65,12 @@ class Pegawai extends Model
         'photo',
         'no_ktp',
     ];
+
+    // Method untuk mendapatkan URL foto melalui route khusus
+    public function getPhotoUrl()
+    {
+        return route('pegawai.photo', ['filename' => $this->photo]);
+    }
 
     // Relasi ke tabel jnj_jabatan
     public function jnj_jabatan()

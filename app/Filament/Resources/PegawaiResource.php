@@ -31,6 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Illuminate\Support\Str;
@@ -79,10 +80,7 @@ class PegawaiResource extends Resource
                     ->maxLength(25),
                 Forms\Components\Select::make('jnj_jabatan')
                     ->label('Jenjang Jabatan')
-                    ->options(function () {
-                        // Ambil semua jabatan dari tabel jnj_jabatan
-                        return jnj_jabatan::all()->pluck('nama', 'kode',);
-                    })
+                    ->options(fn () => \App\Models\jnj_jabatan::pluck('nama', 'kode')) // Pastikan mengambil kode & nama
                     ->createOptionForm([
                         Forms\Components\TextInput::make('kode')
                             ->label('Kode jabatan')
@@ -488,14 +486,13 @@ class PegawaiResource extends Resource
                 Forms\Components\DatePicker::make('mulai_kontrak'),
 
                 FileUpload::make('photo')
-                    ->label('Foto Pegawai')
-                    ->image() // Hanya menerima file gambar
-                    ->disk('local') // Gunakan disk yang kita buat tadi
-                    ->directory('pegawai_photo') // Simpan di folder pegawai_photo di dalam private
-                    ->getUploadedFileNameForStorageUsing(fn ($file) => 'pages/pegawai/photo/' . Str::random(10) . '.' . $file->getClientOriginalExtension()) // Buat nama file unik
-                    ->storeFileNamesIn('photo') // Hanya simpan path relatif ke database
-                    ->visibility('private') // Pastikan file bersifat private
-                    ->required(),
+                    ->directory('pegawai/photo') // Ubah ini, jangan gunakan "pages/pegawai/photo" lagi
+                    ->disk('private') // Gunakan disk 'private'
+                    ->image()
+                    ->visibility('private')
+                    ->preserveFilenames()
+                    ->label('Foto Pegawai'),
+
 
 
                 Forms\Components\TextInput::make('no_ktp')

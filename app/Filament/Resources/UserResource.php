@@ -143,7 +143,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ActionGroup::make([
+
                         Action::make('clear_session')
                             ->label('Clear Session')
                             ->icon('heroicon-o-trash')
@@ -157,8 +157,6 @@ class UserResource extends Resource
                             ->color('warning')
                             ->action(fn (User $record) => $record->update(['password' => bcrypt($record->username)]))
                             ->requiresConfirmation(),
-                    ])->tooltip('Menu')
-                    ->icon('heroicon-o-chevron-left'),
 
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
