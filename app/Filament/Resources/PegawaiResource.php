@@ -79,10 +79,7 @@ class PegawaiResource extends Resource
                     ->maxLength(25),
                 Forms\Components\Select::make('jnj_jabatan')
                     ->label('Jenjang Jabatan')
-                    ->options(function () {
-                        // Ambil semua jabatan dari tabel jnj_jabatan
-                        return jnj_jabatan::all()->pluck('nama', 'kode',);
-                    })
+                    ->options(fn () => \App\Models\jnj_jabatan::pluck('nama', 'kode')) // Pastikan mengambil kode & nama
                     ->createOptionForm([
                         Forms\Components\TextInput::make('kode')
                             ->label('Kode jabatan')
@@ -647,7 +644,6 @@ class PegawaiResource extends Resource
                     ->circular()
                     ->size(50)
                     ->getStateUsing(fn ($record) => $record->photo ? url('/pegawai/photo/' . basename($record->photo)) : null),
-
 
 
                 Tables\Columns\TextColumn::make('no_ktp')
