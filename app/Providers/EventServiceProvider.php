@@ -17,7 +17,7 @@ class EventServiceProvider extends ServiceProvider
         QueryExecuted::class => [
             LogDatabaseQuery::class,
         ],
-        
+
     ];
 
     /**
