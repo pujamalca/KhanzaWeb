@@ -27,6 +27,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Modal\Actions\ButtonAction;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PegawaiResource extends Resource
 {
@@ -493,6 +495,17 @@ class PegawaiResource extends Resource
                     ->preserveFilenames()
                     ->label('Foto Pegawai'),
 
+                Forms\Components\FileUpload::make('photo')
+                    ->image()
+                    ->disk('public') // Simpan di storage public
+                    ->directory('pages/pegawai/photo') // Pastikan folder tetap
+                    ->visibility('public') // Supaya bisa diakses
+                    ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string =>
+                        $file->hashName()) // Simpan hanya nama file, tanpa path berulang
+                    ->dehydrateStateUsing(fn ($state) => $state
+                        ? 'pages/pegawai/photo/' . basename($state)
+                        : null) // Pastikan path tidak bertambah saat edit
+                    ->label('Foto Pegawai'),
 
 
                 Forms\Components\TextInput::make('no_ktp')
@@ -640,10 +653,12 @@ class PegawaiResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('photo')
-                    ->label('Foto Pegawai')
-                    ->circular()
-                    ->size(50)
-                    ->getStateUsing(fn ($record) => $record->photo ? url('/pegawai/photo/' . basename($record->photo)) : null),
+                    ->disk('public') // Pastikan pakai disk 'public'
+                    ->visibility('public') // Pastikan dapat diakses
+                    ->getStateUsing(fn ($record) => asset('storage/' . $record->photo)) // Pastikan URL benar
+                    ->label('Photo Pegawai')
+                    ->circular(), // Opsi untuk membuat gambar bulat (opsional)
+
 
 
 
