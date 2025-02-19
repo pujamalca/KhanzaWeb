@@ -487,14 +487,6 @@ class PegawaiResource extends Resource
                     ->dehydrateStateUsing(fn ($state) => $state === '-' ? 0 : (int) $state), // Konversi "-" ke 0
                 Forms\Components\DatePicker::make('mulai_kontrak'),
 
-                FileUpload::make('photo')
-                    ->directory('pegawai/photo') // Ubah ini, jangan gunakan "pages/pegawai/photo" lagi
-                    ->disk('private') // Gunakan disk 'private'
-                    ->image()
-                    ->visibility('private')
-                    ->preserveFilenames()
-                    ->label('Foto Pegawai'),
-
                 Forms\Components\FileUpload::make('photo')
                     ->image()
                     ->disk('public') // Simpan di storage public
