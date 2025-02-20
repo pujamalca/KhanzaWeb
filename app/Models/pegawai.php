@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Pegawai extends Model
 {
@@ -65,6 +66,30 @@ class Pegawai extends Model
         'photo',
         'no_ktp',
     ];
+
+
+public static function getEnumValues($column, $table = 'pegawai')
+{
+    // Ambil informasi kolom dari database
+    $result = DB::select("SHOW COLUMNS FROM `$table` WHERE Field = ?", [$column]);
+
+    if (!isset($result[0]->Type)) {
+        return []; // Jika tidak ditemukan, kembalikan array kosong
+    }
+
+    // Ambil tipe ENUM dari database
+    preg_match('/^enum\((.*)\)$/', $result[0]->Type, $matches);
+    if (!isset($matches[1])) {
+        return []; // Jika bukan ENUM, kembalikan array kosong
+    }
+
+    // Parse nilai ENUM
+    $enumValues = array_map(fn($value) => trim($value, "'"), explode(',', $matches[1]));
+
+    // Kembalikan dalam format ['value' => 'Label']
+    return array_combine($enumValues, array_map('ucwords', $enumValues));
+}
+
 
     // Method untuk mendapatkan URL foto melalui route khusus
     public function getPhotoUrl()

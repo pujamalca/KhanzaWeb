@@ -35,6 +35,12 @@ return [
             'throw' => false,
         ],
 
+        'pegawai_photo' => [
+            'driver' => 'local',
+            'root' => env('PEGAWAI_PHOTO_PATH', storage_path('app/public/pages/pegawai/photo')),
+        ],
+
+
         'private' => [
             'driver' => 'local',
             'root' => storage_path('app/pages/pegawai/photo'), // Pastikan tidak ada path berulang
