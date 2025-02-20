@@ -31,9 +31,10 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -64,17 +65,14 @@ class PegawaiResource extends Resource
                 Forms\Components\TextInput::make('nik')
                     ->label('NIK')
                     ->required()
-                    ->maxLength(20),
+                    ->maxValue(20),
                 Forms\Components\TextInput::make('nama')
                     ->label('Nama Lengkap (Tanpa Gelar) ya')
                     ->required()
                     ->maxLength(50),
                 Forms\Components\Select::make('jk')
                     ->label('Jenis Kelamin')
-                    ->options([
-                        'pria' => 'Pria',
-                        'wanita' => 'Wanita',
-                    ])
+                    ->options(Pegawai::getEnumValues('jk')) // Ambil ENUM dari database
                     ->required(),
                 Forms\Components\TextInput::make('jbtn')
                     ->label('Jabatan')
@@ -318,7 +316,8 @@ class PegawaiResource extends Resource
                     ->required(),
                     TextInput::make('npwp')
                     ->label('NPWP')// ✅ Perbaiki format validasi
-                    ->live(),
+                    ->live()
+                    ->maxLength(15),
 
                 // Di dalam form builder
                 Select::make('pendidikan')
@@ -343,7 +342,7 @@ class PegawaiResource extends Resource
                             ->unique('pendidikan', 'tingkat'),
                         Forms\Components\TextInput::make('gapok1')
                             ->numeric()
-                            ->label('Gapok ')
+                            ->label('Gapok')
                             ->required(),
                         Forms\Components\TextInput::make('indek')
                             ->numeric()
@@ -420,12 +419,21 @@ class PegawaiResource extends Resource
                     })
                     ->native(false),
 
-                TextInput::make('gapok1')
+                    TextInput::make('gapok1')
                     ->label('Gaji Pokok')
                     ->live()
                     ->numeric()
                     ->required()
-                    ->disabled(), // Non-editable
+                    ->disabled() // Non-editable
+                    ->default(fn ($record) => $record ? pendidikan::where('tingkat', $record->pendidikan)->value('gapok1') ?? 0 : 0)
+                    ->afterStateHydrated(function ($set, $record) {
+                        if ($record) {
+                            // Saat form edit, ambil nilai gapok1 dari pendidikan pegawai
+                            $gapok1 = pendidikan::where('tingkat', $record->pendidikan)->value('gapok1') ?? 0;
+                            $set('gapok1', $gapok1);
+                            $set('gapok', $gapok1); // Pastikan gapok juga tersimpan
+                        }
+                    }),
 
                     // Field gapok untuk disimpan ke tabel pegawai
                 Hidden::make('gapok'), // Hidden agar tidak bisa diubah manual, tapi tetap tersimpan ke DB
@@ -445,11 +453,7 @@ class PegawaiResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('ms_kerja')
                     ->label('Masa Kerja')
-                    ->options([
-                        '<1' => '<1',
-                        'PT' => 'PT',
-                        'FT>1' => 'FT>1',
-                    ])
+                    ->options(Pegawai::getEnumValues('ms_kerja')) // Ambil ENUM dari database
                     ->required(),
                 Forms\Components\select::make('bpd')
                     ->label('Nama Bank')
@@ -464,14 +468,9 @@ class PegawaiResource extends Resource
                     ->maxLength(25),
                 Forms\Components\Select::make('stts_aktif')
                     ->label('Status Aktif')
-                    ->options([
-                        'AKTIF' => 'AKTIF',
-                        'CUTI' => 'CUTI',
-                        'KELUAR' => 'KELUAR',
-                        'TENAGA LUAR' => 'TENAGA LUAR',
-                        'NON AKTIF' => 'NON AKTIF',
-                    ])
+                    ->options(Pegawai::getEnumValues('stts_aktif')) // Ambil ENUM dari database
                     ->required(),
+
                 Select::make('wajibmasuk')
                     ->label('Pilih Opsi Wajib Masuk')
                     ->options([
@@ -489,16 +488,37 @@ class PegawaiResource extends Resource
 
                 Forms\Components\FileUpload::make('photo')
                     ->image()
-                    ->disk('public') // Simpan di storage public
-                    ->directory('pages/pegawai/photo') // Pastikan folder tetap
-                    ->visibility('public') // Supaya bisa diakse
-                    ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string =>
-                        $file->hashName()) // Simpan hanya nama file, tanpa path berulang
-                    ->dehydrateStateUsing(fn ($state) => $state
-                        ? 'pages/pegawai/photo/' . basename($state)
-                        : null) // Pastikan path tidak bertambah saat edit
-                    ->label('Foto Pegawai'),
+                    ->directory('pages/pegawai/photo') // Simpan di Laravel storage (public/pages/pegawai/photo)
+                    ->required()
+                    ->label('Photo')
+                    ->saveUploadedFileUsing(function (UploadedFile $file, callable $set, $state, $record) {
+                        // Ambil NIK dan Nama
+                        $nik = $record->nik ?? ($state['nik'] ?? 'default_nik');
+                        $nama = $record->nama ?? ($state['nama'] ?? 'default_nama');
 
+                        // Bersihkan nama dari karakter yang tidak diizinkan dalam file system
+                        $namaBersih = preg_replace('/[^A-Za-z0-9_\-]/', '_', $nama);
+
+                        // Format nama file: NIK_Nama.ext
+                        $newFileName = "{$nik}_{$namaBersih}." . $file->getClientOriginalExtension();
+
+                        // Simpan di storage Laravel (public/pages/pegawai/photo)
+                        $path = $file->storeAs('pages/pegawai/photo', $newFileName, 'public');
+
+                        // Ambil path tujuan dari konfigurasi filesystem (bukan langsung dari env)
+                        $destinationFolder = config('filesystems.disks.pegawai_photo.root');
+                        $destinationPath = rtrim($destinationFolder, '\\/') . DIRECTORY_SEPARATOR . $newFileName;
+
+                        // Buat direktori tujuan jika belum ada
+                        if (!file_exists(dirname($destinationPath))) {
+                            mkdir(dirname($destinationPath), 0777, true);
+                        }
+
+                        // Copy file ke lokasi tambahan
+                        copy(storage_path('app/public/' . $path), $destinationPath);
+
+                        return $path;
+                    }),
 
                 Forms\Components\TextInput::make('no_ktp')
                     ->label('Nomor KTP')
