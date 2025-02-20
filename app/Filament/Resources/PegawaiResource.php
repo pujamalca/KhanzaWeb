@@ -491,7 +491,7 @@ class PegawaiResource extends Resource
                     ->image()
                     ->disk('public') // Simpan di storage public
                     ->directory('pages/pegawai/photo') // Pastikan folder tetap
-                    ->visibility('public') // Supaya bisa diakses
+                    ->visibility('public') // Supaya bisa diakse
                     ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string =>
                         $file->hashName()) // Simpan hanya nama file, tanpa path berulang
                     ->dehydrateStateUsing(fn ($state) => $state
