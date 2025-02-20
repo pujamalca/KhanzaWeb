@@ -6,6 +6,7 @@ use App\Filament\Resources\PetugasResource\Pages;
 use App\Filament\Resources\PetugasResource\RelationManagers;
 use App\Models\Pegawai;
 use App\Models\Petugas;
+use App\Models\petugas as ModelsPetugas;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -63,13 +64,7 @@ class PetugasResource extends Resource
                     ->dehydrated(),
                 Select::make('gol_darah')
                     ->label('Golongan Darah')
-                    ->options([
-                        'A' => 'A',
-                        'B' => 'B',
-                        'O' => 'O',
-                        'AB' => 'AB',
-                        '-' => '-',
-                    ])
+                    ->options(Petugas::getEnumValues('gol_darah')) // Ambil ENUM dari database
                     ->searchable()
                     ->placeholder('Pilih Golongan Darah') // Jika ingin bisa dicari
                     ->required(),  // Jika kolom wajib diisi
@@ -97,13 +92,7 @@ class PetugasResource extends Resource
                     ->maxLength(13),
                 Select::make('stts_nikah')
                     ->label('Status Pernikahan')
-                    ->options([
-                        'BELUM MENIKAH' => 'Belum Menikah',
-                        'MENIKAH' => 'Menikah',
-                        'JANDA' => 'Janda',
-                        'DUDA' => 'Duda',
-                        'JOMBLO' => 'Jomblo',
-                    ])
+                    ->options(Petugas::getEnumValues('stts_nikah')) // Ambil ENUM dari database
                     ->searchable()
                     ->required(),
                 Select::make('kd_jbtn')

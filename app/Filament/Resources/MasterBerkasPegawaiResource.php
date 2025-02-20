@@ -6,7 +6,10 @@ use App\Filament\Resources\MasterBerkasPegawaiResource\Pages;
 use App\Filament\Resources\MasterBerkasPegawaiResource\RelationManagers;
 use App\Models\master_berkas_pegawai;
 use App\Models\MasterBerkasPegawai;
+use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -36,6 +39,27 @@ class MasterBerkasPegawaiResource extends Resource
         return $form
             ->schema([
                 //
+                TextInput::make('kode')
+                    ->label('Kode')
+                    ->required()
+                    ->unique('master_berkas_pegawai', 'kode')
+                    ->default(fn () => master_berkas_pegawai::generateNewKode()),
+                Select::make('kategori')
+                    ->label('Kategori')
+                    ->options(master_berkas_pegawai::getEnumValues('kategori')) // Ambil ENUM dari database
+                    ->searchable()
+                    ->required(),
+                TextInput::make('nama_berkas')
+                    ->label('Nama Berkas')
+                    ->required()
+                    ->live() // Mengupdate state secara langsung saat diketik
+                    ->afterStateUpdated(fn (\Filament\Forms\Set $set, $state) => $set('nama_berkas', strtoupper($state)))
+                    ->extraAttributes(['style' => 'text-transform: uppercase;']),
+                TextInput::make('no_urut')
+                    ->label('No Urut')
+                    ->numeric()
+                    ->required(),
+            
             ]);
     }
 
@@ -86,7 +110,7 @@ class MasterBerkasPegawaiResource extends Resource
         return [
             'index' => Pages\ListMasterBerkasPegawais::route('/'),
             'create' => Pages\CreateMasterBerkasPegawai::route('/create'),
-            'edit' => Pages\EditMasterBerkasPegawai::route('/{record}/edit'),
+            // 'edit' => Pages\EditMasterBerkasPegawai::route('/{record}/edit'),
         ];
     }
 }

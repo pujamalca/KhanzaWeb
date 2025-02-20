@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class dokter extends Model
 {
@@ -33,6 +34,28 @@ class dokter extends Model
         'no_ijn_praktek',
         'status',
     ];
+
+    public static function getEnumValues($column, $table = 'dokter')
+    {
+        // Ambil informasi kolom dari database
+        $result = DB::select("SHOW COLUMNS FROM `$table` WHERE Field = ?", [$column]);
+
+        if (!isset($result[0]->Type)) {
+            return []; // Jika tidak ditemukan, kembalikan array kosong
+        }
+
+        // Ambil tipe ENUM dari database
+        preg_match('/^enum\((.*)\)$/', $result[0]->Type, $matches);
+        if (!isset($matches[1])) {
+            return []; // Jika bukan ENUM, kembalikan array kosong
+        }
+
+        // Parse nilai ENUM
+        $enumValues = array_map(fn($value) => trim($value, "'"), explode(',', $matches[1]));
+
+        // Kembalikan dalam format ['value' => 'Label']
+        return array_combine($enumValues, array_map('ucwords', $enumValues));
+    }
 
     public function pegawai()
     {

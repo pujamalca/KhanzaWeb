@@ -75,13 +75,7 @@ class DokterResource extends Resource
                     ->dehydrated(),
                 Select::make('gol_drh')
                     ->label('Golongan Darah')
-                    ->options([
-                        'A' => 'A',
-                        'B' => 'B',
-                        'O' => 'O',
-                        'AB' => 'AB',
-                        '-' => '-',
-                    ])
+                    ->options(Dokter::getEnumValues('gol_drh')) // Ambil ENUM dari database
                     ->searchable()
                     ->placeholder('Pilih Golongan Darah') // Jika ingin bisa dicari
                     ->required(),  // Jika kolom wajib diisi
@@ -108,13 +102,7 @@ class DokterResource extends Resource
                     ->default(null),
                 Select::make('stts_nikah')
                     ->label('Status Pernikahan')
-                    ->options([
-                        'BELUM MENIKAH' => 'Belum Menikah',
-                        'MENIKAH' => 'Menikah',
-                        'JANDA' => 'Janda',
-                        'DUDA' => 'Duda',
-                        'JOMBLO' => 'Jomblo',
-                    ])
+                    ->options(Dokter::getEnumValues('stts_nikah')) // Ambil ENUM dari database
                     ->searchable()
                     ->required(),
 
