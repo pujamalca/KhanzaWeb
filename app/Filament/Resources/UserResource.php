@@ -24,6 +24,11 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
+    public static function getNavigationBadge(): ?string
+        {
+            return static::getModel()::count();
+        }
+
     protected static ?string $navigationGroup = 'Admin';
 
     // Label jamak, ganti dengan singular jika perlu
@@ -50,7 +55,6 @@ class UserResource extends Resource
                             })->toArray()
                         )
                         ->searchable()
-                        ->required()
                         ->live()
                         ->afterStateUpdated(fn ($state, callable $set) => self::updateUserData($state, $set)), // Update fields otomatis
 
@@ -73,6 +77,18 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
+
+                // Using Select Component
+                Forms\Components\Select::make('roles')
+                ->relationship('roles', 'name')
+                ->multiple()
+                ->preload()
+                ->searchable(),
+
+                // Using CheckboxList Component
+                Forms\Components\CheckboxList::make('roles')
+                ->relationship('roles', 'name')
+                ->searchable(),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Diaktifkan untuk pengguna')
                     ->default(true)
@@ -113,6 +129,9 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('username')
                     ->label('NIK')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Role')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
@@ -156,7 +175,7 @@ class UserResource extends Resource
                                 ->where('id', $record->last_session_id)
                                 ->delete();
                         }
-                        
+
                         // Kosongkan last_session_id pada tabel users
                         $record->update(['last_session_id' => null]);
                     })

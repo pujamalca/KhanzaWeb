@@ -28,7 +28,7 @@ class LogDatabaseQuery
             if (!is_null($binding)) {
                 $query = preg_replace('/\?/', $binding, $query, 1);
             }
-            
+
         }
 
         // Cek apakah query adalah `INSERT`, `UPDATE`, atau `DELETE`
@@ -74,6 +74,8 @@ class LogDatabaseQuery
                 // Format query dan IP address dalam satu string untuk INSERT/UPDATE
                 $sqle = $ipAddress . ' ' . strtoupper($event->connectionName) . ' ' . $query;
             }
+
+            $sqle = $event->sql; // Mendefinisikan variabel $sqle dengan query yang dieksekusi
 
             // Catat ke tabel trackersql
             DB::table('trackersql')->insert([

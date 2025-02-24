@@ -25,6 +25,11 @@ class PetugasResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    public static function getNavigationBadge(): ?string
+        {
+            return static::getModel()::count();
+        }
+
     protected static ?string $navigationGroup = 'SDM';
 
     public static function form(Form $form): Form

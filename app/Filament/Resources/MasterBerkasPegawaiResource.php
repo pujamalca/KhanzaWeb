@@ -23,6 +23,11 @@ class MasterBerkasPegawaiResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getNavigationBadge(): ?string
+        {
+            return static::getModel()::count();
+        }
+
     protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu
@@ -59,7 +64,7 @@ class MasterBerkasPegawaiResource extends Resource
                     ->label('No Urut')
                     ->numeric()
                     ->required(),
-            
+
             ]);
     }
 

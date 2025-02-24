@@ -45,6 +45,11 @@ class PegawaiResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
+    public static function getNavigationBadge(): ?string
+        {
+            return static::getModel()::count();
+        }
+
     protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu

@@ -23,8 +23,11 @@ use App\Filament\Auth\CustomLogin;
 use App\Http\Controllers\Auth\CustomLogoutController;
 use App\Filament\Pages\Settings;
 use App\Http\Middleware\AutoLogout;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Navigation\UserMenuItem;
+use Filament\Pages\Dashboard;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
 class SuperadminPanelProvider extends PanelProvider
@@ -34,6 +37,7 @@ class SuperadminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+
             ->default()
             ->id('superadmin')
             ->path('superadmin')
@@ -79,6 +83,25 @@ class SuperadminPanelProvider extends PanelProvider
             ->routes(fn() => [])
             ->plugins([
                 SpotlightPlugin::make(),
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+
+                FilamentShieldPlugin::make()
+                    ->gridColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 3
+                    ])
+                    ->sectionColumnSpan(1)
+                    ->checkboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 4,
+                    ])
+                    ->resourceCheckboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
             ]);;
     }
 }
+
