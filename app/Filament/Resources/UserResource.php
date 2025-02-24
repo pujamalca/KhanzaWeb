@@ -16,6 +16,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class UserResource extends Resource
 {
@@ -144,14 +145,24 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
 
-                        Action::make('clear_session')
-                            ->label('Clear Session')
-                            ->icon('heroicon-o-trash')
-                            ->color('danger')
-                            ->action(fn (User $record) => $record->update(['last_session_id' => null]))
-                            ->requiresConfirmation(),
+                    Action::make('clear_session')
+                    ->label('Clear Session')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->action(function (User $record) {
+                        // Jika user memiliki session aktif, hapus session tersebut dari tabel sessions
+                        if ($record->last_session_id) {
+                            DB::table('sessions')
+                                ->where('id', $record->last_session_id)
+                                ->delete();
+                        }
+                        
+                        // Kosongkan last_session_id pada tabel users
+                        $record->update(['last_session_id' => null]);
+                    })
+                    ->requiresConfirmation(),
 
-                            Action::make('reset_password')
+                    Action::make('reset_password')
                             ->label('Reset Password')
                             ->icon('heroicon-o-key')
                             ->color('warning')
