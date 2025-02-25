@@ -25,7 +25,7 @@ class BerkasPegawaiResource extends Resource
 {
     protected static ?string $model = berkas_pegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
         {
