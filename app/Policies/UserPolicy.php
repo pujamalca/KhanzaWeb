@@ -141,4 +141,10 @@ class UserPolicy
     {
         return $user->can('reorder_user');
     }
+
+
+    public function clearSession_user_user(User $user, User $model): bool
+    {
+        return $user->can('clearSession_user_user');
+    }
 }

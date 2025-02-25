@@ -18,6 +18,7 @@ class berkas_pegawai extends Model
     protected $fillable = [
         'nik',
         'tgl_uploud',
+        'tgl_berakhir',
         'kode_berkas',
         'berkas',
     ];

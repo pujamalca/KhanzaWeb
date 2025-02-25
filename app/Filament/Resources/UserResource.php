@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\Pegawai;
 use App\Models\User;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 
-class UserResource extends Resource
+class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
@@ -164,7 +165,7 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
 
-                    Action::make('clear_session')
+                    Action::make('clearSession_user_user')
                     ->label('Clear Session')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
@@ -179,7 +180,8 @@ class UserResource extends Resource
                         // Kosongkan last_session_id pada tabel users
                         $record->update(['last_session_id' => null]);
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => auth()->user()->can('clearSession_user_user', $record)),
 
                     Action::make('reset_password')
                             ->label('Reset Password')
@@ -215,6 +217,19 @@ class UserResource extends Resource
     {
         return [
             'index' => Pages\ManageUsers::route('/'),
+        ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+            'clearSession_user'
         ];
     }
 }
