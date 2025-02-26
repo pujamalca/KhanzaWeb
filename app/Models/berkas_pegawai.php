@@ -26,12 +26,13 @@ class berkas_pegawai extends Model
 
     public function getUrlAttribute()
     {
-        if (!$this->path) {
-            return null; // Mencegah error jika path kosong
+        if (!$this->berkas) {
+            return null;
         }
 
-        return route('pegawai.berkas', ['filename' => basename($this->path)]);
+        return route('pegawai.berkas', ['filename' => basename($this->berkas)]);
     }
+
 
 
      // Relasi ke model Pegawai

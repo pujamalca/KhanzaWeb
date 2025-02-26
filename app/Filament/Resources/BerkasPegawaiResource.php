@@ -96,13 +96,15 @@ class BerkasPegawaiResource extends Resource
                     })
                     ->required()
                     ->searchable(),
-                FileUpload::make('berkas')
+                    FileUpload::make('berkas')
                     ->label('Berkas')
                     ->image()
                     ->disk('pegawai')
-                    ->directory('pages/berkaspegawai/photo') // Direktori yang benar
-                    ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Simpan dengan nama unik
+                    ->directory('pages/berkaspegawai/photo') // Direktori penyimpanan
+                    ->storeFileNamesIn('berkas') // Pastikan hanya menyimpan nama file
+                    ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Gunakan nama unik
                     ->required(),
+
 
                 Checkbox::make('set_tgl_berakhir')
                     ->label('Aktifkan Tanggal Berakhir Jika Berkas Ada Batas Waktu')
@@ -152,6 +154,12 @@ class BerkasPegawaiResource extends Resource
                     ->sortable()
                     ->searchable(),
                     Tables\Columns\ImageColumn::make('berkas')
+                    ->extraAttributes([
+                        'title' => 'Klik untuk melihat lebih besar',
+                        'style' => 'cursor: pointer;',
+                        'onclick' => "window.open(this.src, '_blank')"
+                    ])
+                    ->sortable()
                     ->getStateUsing(fn ($record) => $record->url) // Ambil dari model
                     ->label('Berkas Pegawai'),
 

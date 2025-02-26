@@ -17,9 +17,10 @@ Route::get('/berkas-pegawai/{filename}', function ($filename) {
     $filePath = "pages/berkaspegawai/photo/{$filename}";
 
     if (!Storage::disk('pegawai')->exists($filePath)) {
-        abort(404, 'File tidak ditemukan.');
+        return response()->json(['error' => 'File tidak ditemukan.'], 404);
     }
 
-    return response()->file(storage_path("app/pages/pegawai/photo/{$filename}"));
-})->name('pegawai.berkas')->middleware('auth'); // Tambahkan middleware jika hanya user tertentu yang boleh akses
+    return response()->file(Storage::disk('pegawai')->path($filePath));
+})->name('pegawai.berkas')->middleware('auth');
+
 
