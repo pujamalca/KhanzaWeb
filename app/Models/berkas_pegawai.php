@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class berkas_pegawai extends Model
 {
@@ -11,7 +12,7 @@ class berkas_pegawai extends Model
     protected $table = 'berkas_pegawai';
       // Primary key tidak di-increment otomatis
     public $incrementing = false;
-    protected $primaryKey = null; // Tidak ada primary key
+    protected $primaryKey = 'nik'; // Tidak ada primary key
 
     public $timestamps = false;
 
@@ -22,6 +23,16 @@ class berkas_pegawai extends Model
         'kode_berkas',
         'berkas',
     ];
+
+    public function getUrlAttribute()
+    {
+        if (!$this->path) {
+            return null; // Mencegah error jika path kosong
+        }
+
+        return route('pegawai.berkas', ['filename' => basename($this->path)]);
+    }
+
 
      // Relasi ke model Pegawai
      public function pegawai()

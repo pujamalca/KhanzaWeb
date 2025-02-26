@@ -20,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class BerkasPegawaiResource extends Resource
 {
@@ -62,13 +63,13 @@ class BerkasPegawaiResource extends Resource
                     ->label('Nama Pegawai')
                     ->disabled() // Tidak bisa diisi manual
                     ->dehydrated(), // Pastikan tetap tersimpan di DB
-                DatePicker::make('tgl_upload')
+                DatePicker::make('tgl_uploud')
                     ->label('Tanggal Upload')
                     ->default(Carbon::now()) // Set default tanggal hari ini
                     ->native(false)
                     ->displayFormat('d/m/Y')
                     ->format('Y-m-d') // Format penyimpanan ke database
-                    ->disabled() // Tidak bisa diupdate saat edit
+                    ->readOnly() // Tidak bisa diupdate saat edit
                     ->required(),
 
                 Select::make('kategori')
@@ -80,7 +81,7 @@ class BerkasPegawaiResource extends Resource
                     )
                     ->required()
                     ->reactive(),
-                Select::make('kode')
+                Select::make('kode_berkas')
                     ->label('Kode Berkas')
                     ->options(function (callable $get) {
                         $kategori = $get('kategori'); // Ambil kategori yang dipilih
@@ -94,15 +95,15 @@ class BerkasPegawaiResource extends Resource
                             ->map(fn($nama_berkas, $kode) => "$kode - $nama_berkas");
                     })
                     ->required()
-                    ->disabled(fn (callable $get) => !$get('kategori'))
-                    ->searchable()
-                    ->required(),
+                    ->searchable(),
                 FileUpload::make('berkas')
                     ->label('Berkas')
                     ->image()
-                    ->directory('pages/berkaspegawai/photo') // Simpan di Laravel storage (public/pages/pegawai/photo)
-                    ->required()
-                    ->label('berkas'),
+                    ->disk('pegawai')
+                    ->directory('pages/berkaspegawai/photo') // Direktori yang benar
+                    ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Simpan dengan nama unik
+                    ->required(),
+
                 Checkbox::make('set_tgl_berakhir')
                     ->label('Aktifkan Tanggal Berakhir Jika Berkas Ada Batas Waktu')
                     ->reactive(), // Agar langsung merespons saat dicentang
@@ -139,12 +140,23 @@ class BerkasPegawaiResource extends Resource
     {
         return $table
             ->columns([
-                    Tables\Columns\TextColumn::make('nik')->sortable()->searchable(),
-                    Tables\Columns\TextColumn::make('tgl_upload')->date(),
-                    Tables\Columns\TextColumn::make('kode_berkas')->sortable()->searchable(),
-                    Tables\Columns\TextColumn::make('berkas')->limit(50),
+                    Tables\Columns\TextColumn::make('nik')
+                    ->sortable()
+                    ->searchable()
+                    ->label('NIK'),
+                    Tables\Columns\TextColumn::make('tgl_uploud')
+                    ->label('Tanggal Upload')
+                    ->date(),
+                    Tables\Columns\TextColumn::make('kode_berkas')
+                    ->label('Kode Berkas')
+                    ->sortable()
+                    ->searchable(),
+                    Tables\Columns\ImageColumn::make('berkas')
+                    ->getStateUsing(fn ($record) => $record->url) // Ambil dari model
+                    ->label('Berkas Pegawai'),
+
             ])
-            ->defaultSort('tgl_upload', 'desc')
+            ->defaultSort('tgl_uploud', 'desc')
             ->filters([
                 //
             ])

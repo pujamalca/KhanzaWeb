@@ -46,6 +46,13 @@ return [
             'root' => storage_path('app/pages/pegawai/photo'), // Pastikan tidak ada path berulang
         ],
 
+        'pegawai' => [
+            'driver' => 'local',
+            'root' => storage_path('app/pages/pegawai/photo'),
+            'url' => env('APP_URL') . '/storage/pages/pegawai/photo',
+            'visibility' => 'private',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
