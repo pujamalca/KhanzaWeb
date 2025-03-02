@@ -524,7 +524,6 @@ class PegawaiResource extends Resource
 
                         return $path;
                     }),
-
                 Forms\Components\TextInput::make('no_ktp')
                     ->label('Nomor KTP')
                     ->required()
@@ -675,10 +674,6 @@ class PegawaiResource extends Resource
                     ->getStateUsing(fn ($record) => asset('storage/' . $record->photo)) // Pastikan URL benar
                     ->label('Photo Pegawai')
                     ->circular(), // Opsi untuk membuat gambar bulat (opsional)
-
-
-
-
                 Tables\Columns\TextColumn::make('no_ktp')
                     ->label('No KTP')
                     ->sortable()

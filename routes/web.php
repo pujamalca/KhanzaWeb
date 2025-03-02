@@ -13,14 +13,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/berkas-pegawai/{filename}', function ($filename) {
-    $filePath = "pages/berkaspegawai/photo/{$filename}";
+
+
+Route::get('/berkas-pegawai/download/{record}/{filename}', function ($record, $filename) {
+    $filePath = "pages/berkaspegawai/photo/$filename";
 
     if (!Storage::disk('pegawai')->exists($filePath)) {
-        return response()->json(['error' => 'File tidak ditemukan.'], 404);
+        abort(404, 'File tidak ditemukan');
     }
 
-    return response()->file(Storage::disk('pegawai')->path($filePath));
-})->name('pegawai.berkas')->middleware('auth');
+    return response()->file(Storage::disk('pegawai')->path($filePath), [
+        'Content-Disposition' => 'inline',
+    ]);
+})->name('filament.resources.berkas-pegawai.download');
 
 

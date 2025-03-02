@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Storage;
 
 class berkas_pegawai extends Model
@@ -24,16 +25,31 @@ class berkas_pegawai extends Model
         'berkas',
     ];
 
-    public function getUrlAttribute()
-    {
-        if (!$this->berkas) {
-            return null;
-        }
 
-        return route('pegawai.berkas', ['filename' => basename($this->berkas)]);
+    public function getUrlAttribute()
+{
+    if (!$this->berkas) {
+        return null;
     }
 
-
+    return route('filament.resources.berkas-pegawai.download', ['record' => $this->nik, 'filename' => basename($this->berkas)]);
+}
+    
+     // Override delete() agar hanya menghapus berdasarkan nik + kode_berkas
+     public function delete()
+     {
+         return static::where('nik', $this->nik)
+             ->where('kode_berkas', $this->kode_berkas)
+             ->delete();
+     }
+ 
+     // Override untuk Filament agar bisa menemukan record dengan nik + kode_berkas
+     public function resolveRouteBinding($value, $field = null)
+     {
+         return static::where('nik', request()->route('record'))
+             ->where('kode_berkas', request()->query('kode_berkas'))
+             ->firstOrFail();
+     }
 
      // Relasi ke model Pegawai
      public function pegawai()
@@ -45,4 +61,6 @@ class berkas_pegawai extends Model
      {
          return $this->belongsTo(master_berkas_pegawai::class, 'kode_berkas', 'kode');
      }
+
+     
 }

@@ -196,10 +196,6 @@ class UserResource extends Resource implements HasShieldPermissions
 
                 ]),
             ])
-
-
-
-
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -227,8 +223,14 @@ class UserResource extends Resource implements HasShieldPermissions
             'view_any',
             'create',
             'update',
+            'restore',
+            'restore_any',
+            'replicate',
+            'reorder',
             'delete',
             'delete_any',
+            'force_delete',
+            'force_delete_any',
             'clearSession_user'
         ];
     }

@@ -85,7 +85,7 @@ return [
     ],
 
     'register_role_policy' => [
-        'enabled' => true,
+        'enabled' => false,
     ],
 
 ];
