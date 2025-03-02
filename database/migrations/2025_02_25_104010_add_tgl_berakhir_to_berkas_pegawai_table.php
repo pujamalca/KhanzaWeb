@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('berkas_pegawai', function (Blueprint $table) {
-            $table->date('tgl_berakhir')->nullable()->after('tgl_upload'); // Menambahkan kolom tgl_berakhir setelah tgl_upload
+            $table->date('tgl_berakhir')->nullable()->after('tgl_uploud'); // Menambahkan kolom tgl_berakhir setelah tgl_upload
         });
     }
 

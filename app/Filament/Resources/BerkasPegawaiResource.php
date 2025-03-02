@@ -56,24 +56,25 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
             ->schema([
                 //
                 Select::make('nik')
-                    ->label('NIK Pegawai')
-                    ->placeholder('Pilih NIK')
-                    ->options(
-                        Pegawai::when(
-                            auth()->user()->can('view_master::berkas::pegawai'), // Cek apakah user punya izin lihat semua pegawai
-                            fn ($query) => $query, // Jika punya izin, tampilkan semua
-                            fn ($query) => $query->where('nik', auth()->user()->username) // Jika tidak, tampilkan hanya miliknya
-                        )
-                        ->pluck('nama', 'nik')
-                        ->map(fn($nama, $nik) => "$nik - $nama")
+                ->label('NIK Pegawai')
+                ->placeholder('Pilih NIK')
+                ->options(
+                    Pegawai::when(
+                        auth()->user()->can('view_master::berkas::pegawai'), 
+                        fn ($query) => $query, 
+                        fn ($query) => $query->where('nik', auth()->user()->username) 
                     )
-                    ->searchable()
-                    ->disabled(!auth()->user()->can('view_master::berkas::pegawai')) // Jika user tidak punya izin, maka dropdown dikunci
-                    ->afterStateHydrated(fn ($state, callable $set, $record) => 
-                        $set('nik', $record?->nik ?? auth()->user()->username) // Set NIK saat form di-load
-                    )
-                    ->afterStateUpdated(fn ($state, callable $set) => self::updatePegawaiData($state, $set)),
-
+                    ->pluck('nama', 'nik')
+                    ->map(fn($nama, $nik) => "$nik - $nama")
+                )
+                ->searchable()
+                ->dehydrated() // Pastikan nilai disertakan saat submit
+                ->required()
+                ->default(auth()->user()->username) // Set default sesuai username user
+                ->afterStateHydrated(fn ($state, callable $set, $record) => 
+                    $set('nik', $record?->nik ?? auth()->user()->username)
+                    ),
+            
                 TextInput::make('nama')
                     ->label('Nama Pegawai')
                     ->disabled() // Nama tetap tidak bisa diubah
@@ -95,7 +96,6 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     ->placeholder('Pilih ini Dulu')
                     ->options(
                         master_berkas_pegawai::all()->pluck('kategori', 'kategori')  
-                                               
                     )
                     ->live() // Memungkinkan update data secara real-time
                     ->required(),
