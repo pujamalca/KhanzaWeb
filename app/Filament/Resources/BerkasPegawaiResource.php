@@ -130,14 +130,17 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                         };
                     }),
                     FileUpload::make('berkas')
-                    ->label('Berkas')
-                    ->image()
-                    ->visibility('private')
-                    ->disk('pegawai') // Gunakan disk pegawai
-                    ->directory('pages/berkaspegawai/photo') // Direktori penyimpanan
-                    ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Simpan dengan nama unik
-                    ->deleteUploadedFileUsing(fn ($record) => Storage::disk('pegawai')->delete($record->berkas)) // Hapus otomatis
-                    ->required(),
+                        ->label('Berkas')
+                        ->uploadingMessage('Uploading...')
+                        ->downloadable()
+                        ->acceptedFileTypes(['image/*', 'application/pdf']) // Terima semua gambar & PDF
+                        ->maxSize(5120) // Maksimal ukuran 5MB
+                        ->visibility('private')
+                        ->disk('pegawai') // Gunakan disk pegawai
+                        ->directory('pages/berkaspegawai/photo') // Direktori penyimpanan
+                        ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Simpan dengan nama unik
+                        ->deleteUploadedFileUsing(fn ($record) => Storage::disk('pegawai')->delete($record->berkas)) // Hapus otomatis
+                        ->required(),
 
 
                 Checkbox::make('set_tgl_berakhir')
