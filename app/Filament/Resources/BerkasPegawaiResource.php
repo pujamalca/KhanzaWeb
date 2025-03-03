@@ -60,9 +60,9 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                 ->placeholder('Pilih NIK')
                 ->options(
                     Pegawai::when(
-                        auth()->user()->can('view_master::berkas::pegawai'), 
-                        fn ($query) => $query, 
-                        fn ($query) => $query->where('nik', auth()->user()->username) 
+                        auth()->user()->can('view_master::berkas::pegawai'),
+                        fn ($query) => $query,
+                        fn ($query) => $query->where('nik', auth()->user()->username)
                     )
                     ->pluck('nama', 'nik')
                     ->map(fn($nama, $nik) => "$nik - $nama")
@@ -71,16 +71,16 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                 ->dehydrated() // Pastikan nilai disertakan saat submit
                 ->required()
                 ->default(auth()->user()->username) // Set default sesuai username user
-                ->afterStateHydrated(fn ($state, callable $set, $record) => 
+                ->afterStateHydrated(fn ($state, callable $set, $record) =>
                     $set('nik', $record?->nik ?? auth()->user()->username)
                     ),
-            
+
                 TextInput::make('nama')
                     ->label('Nama Pegawai')
                     ->disabled() // Nama tetap tidak bisa diubah
-                    ->afterStateHydrated(fn ($state, callable $set, $record) => 
+                    ->afterStateHydrated(fn ($state, callable $set, $record) =>
                         $set('nama', $record?->pegawai?->nama ?? Pegawai::where('nik', auth()->user()->username)->value('nama'))
-                        ),                
+                        ),
 
                 DatePicker::make('tgl_uploud')
                     ->label('Tanggal Upload')
@@ -95,7 +95,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     ->label('Kategori')
                     ->placeholder('Pilih ini Dulu')
                     ->options(
-                        master_berkas_pegawai::all()->pluck('kategori', 'kategori')  
+                        master_berkas_pegawai::all()->pluck('kategori', 'kategori')
                     )
                     ->live() // Memungkinkan update data secara real-time
                     ->required(),
@@ -124,19 +124,24 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     ->getUploadedFileNameForStorageUsing(fn ($file) => $file->hashName()) // Simpan dengan nama unik
                     ->deleteUploadedFileUsing(fn ($record) => Storage::disk('pegawai')->delete($record->berkas)) // Hapus otomatis
                     ->required(),
-                
-                                             
+
+
                 Checkbox::make('set_tgl_berakhir')
                     ->label('Aktifkan Tanggal Berakhir Jika Berkas Ada Batas Waktu')
-                    ->reactive(), // Agar langsung merespons saat dicentang
+                    ->reactive()
+                    ->afterStateHydrated(fn ($state, callable $set, $record) =>
+                        $set('set_tgl_berakhir', (bool) $record?->tgl_berakhir) // Aktifkan otomatis jika ada tgl_berakhir
+                ),
 
                 DatePicker::make('tgl_berakhir')
                     ->label('Tanggal Berakhir')
                     ->placeholder('Pilih Tanggal')
                     ->native(false)
                     ->displayFormat('d/m/Y') // Format tampilan
+                    ->format('Y-m-d') // Format penyimpanan di database
                     ->visible(fn (callable $get) => $get('set_tgl_berakhir')) // Muncul hanya jika dicentang
-                    ->required(fn (callable $get) => $get('set_tgl_berakhir')), // Wajib diisi jika dicentang
+                    ->required(fn (callable $get) => $get('set_tgl_berakhir')) // Wajib diisi jika dicentang
+                    ->dehydrated(), // Pastikan nilai dikirim saat form disubmit
             ]);
     }
 
@@ -158,7 +163,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
         }
     }
 
-    
+
 
     public static function table(Table $table): Table
     {
@@ -173,6 +178,11 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     Tables\Columns\TextColumn::make('tgl_uploud')
                     ->label('Tanggal Upload')
                     ->date(),
+                    Tables\Columns\TextColumn::make('tgl_berakhir')
+    ->label('Masa Berlaku')
+    ->formatStateUsing(fn ($state) =>
+        $state ? \Carbon\Carbon::now()->diff(\Carbon\Carbon::parse($state))->format('%y Tahun %m Bulan') : '-'
+            ),
                     Tables\Columns\TextColumn::make('master_berkas_pegawai.kategori')
                     ->label('Kategori')
                     ->sortable()
@@ -193,7 +203,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                         ->sortable()
                         ->getStateUsing(fn ($record) => $record->url) // Ambil dari model
                         ->label('Berkas Pegawai'),
-                    
+
 
 
             ])
