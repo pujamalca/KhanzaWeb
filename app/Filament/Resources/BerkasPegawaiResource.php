@@ -8,6 +8,7 @@ use App\Models\berkas_pegawai;
 use App\Models\master_berkas_pegawai;
 use App\Models\Pegawai;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
@@ -70,6 +71,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                 ->searchable()
                 ->dehydrated() // Pastikan nilai disertakan saat submit
                 ->required()
+                ->live()
                 ->default(auth()->user()->username) // Set default sesuai username user
                 ->afterStateHydrated(fn ($state, callable $set, $record) =>
                     $set('nik', $record?->nik ?? auth()->user()->username)
@@ -77,10 +79,12 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
 
                 TextInput::make('nama')
                     ->label('Nama Pegawai')
+                    ->placeholder('Terisi Otomatis Dari NIK')
                     ->disabled() // Nama tetap tidak bisa diubah
                     ->afterStateHydrated(fn ($state, callable $set, $record) =>
                         $set('nama', $record?->pegawai?->nama ?? Pegawai::where('nik', auth()->user()->username)->value('nama'))
-                        ),
+                        )
+                    ->live(),
 
                 DatePicker::make('tgl_uploud')
                     ->label('Tanggal Upload')
@@ -99,10 +103,10 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     )
                     ->live() // Memungkinkan update data secara real-time
                     ->required(),
-                Select::make('kode_berkas')
+                    Select::make('kode_berkas')
                     ->label('Kode Berkas')
                     ->options(function (callable $get) {
-                        $kategori = $get('kategori'); // Ambil kategori yang dipilih
+                        $kategori = $get('kategori');
                         if (!$kategori) {
                             return [];
                         }
@@ -114,7 +118,17 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     })
                     ->required()
                     ->searchable()
-                    ->live(),
+                    ->live()
+                    ->rules(function (callable $get) {
+                        return function (string $attribute, $value, Closure $fail) use ($get) {
+                            $nik = $get('nik');
+
+                            // Cek apakah ada nik + kode_berkas yang sama
+                            if (berkas_pegawai::where('nik', $nik)->where('kode_berkas', $value)->exists()) {
+                                $fail("Pegawai dengan NIK $nik sudah memiliki kode berkas ini.");
+                            }
+                        };
+                    }),
                     FileUpload::make('berkas')
                     ->label('Berkas')
                     ->image()
@@ -179,10 +193,10 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                     ->label('Tanggal Upload')
                     ->date(),
                     Tables\Columns\TextColumn::make('tgl_berakhir')
-    ->label('Masa Berlaku')
-    ->formatStateUsing(fn ($state) =>
-        $state ? \Carbon\Carbon::now()->diff(\Carbon\Carbon::parse($state))->format('%y Tahun %m Bulan') : '-'
-            ),
+                    ->label('Masa Berlaku')
+                    ->formatStateUsing(fn ($state) =>
+                        $state ? \Carbon\Carbon::now()->diff(\Carbon\Carbon::parse($state))->format('%y Tahun %m Bulan') : '-'
+                            ),
                     Tables\Columns\TextColumn::make('master_berkas_pegawai.kategori')
                     ->label('Kategori')
                     ->sortable()
@@ -203,9 +217,6 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
                         ->sortable()
                         ->getStateUsing(fn ($record) => $record->url) // Ambil dari model
                         ->label('Berkas Pegawai'),
-
-
-
             ])
             ->defaultSort('tgl_uploud', 'desc')
             ->filters([
@@ -244,10 +255,6 @@ public static function applyEloquentQuery(Builder $query): Builder
         fn ($query) => $query->where('nik', auth()->user()->username) // Filter hanya NIK yang sama
     );
 }
-
-
-
-
 
     public static function getRelations(): array
     {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filament\Resources\BerkasPegawaiResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,20 @@ class berkas_pegawai extends Model
         'berkas',
     ];
 
+    protected static function boot()
+{
+    parent::boot();
+
+    static::saving(function ($model) {
+        if (BerkasPegawaiResource::where('nik', $model->nik)
+            ->where('kode_berkas', $model->kode_berkas)
+            ->exists()) {
+            throw new \Exception("Pegawai dengan NIK {$model->nik} sudah memiliki kode berkas ini, Silahkan Edit.");
+        }
+    });
+}
+
+
 
     public function getUrlAttribute()
 {
@@ -34,7 +49,7 @@ class berkas_pegawai extends Model
 
     return route('filament.resources.berkas-pegawai.download', ['record' => $this->nik, 'filename' => basename($this->berkas)]);
 }
-    
+
      // Override delete() agar hanya menghapus berdasarkan nik + kode_berkas
      public function delete()
      {
@@ -42,7 +57,7 @@ class berkas_pegawai extends Model
              ->where('kode_berkas', $this->kode_berkas)
              ->delete();
      }
- 
+
      // Override untuk Filament agar bisa menemukan record dengan nik + kode_berkas
      public function resolveRouteBinding($value, $field = null)
      {
@@ -62,5 +77,5 @@ class berkas_pegawai extends Model
          return $this->belongsTo(master_berkas_pegawai::class, 'kode_berkas', 'kode');
      }
 
-     
+
 }
