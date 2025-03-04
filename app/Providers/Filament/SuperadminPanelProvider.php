@@ -37,7 +37,12 @@ class SuperadminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-
+        ///Mengatur urutan navigation group
+            ->navigationGroups([
+                'ERM',
+                'SDM',
+                'Admin',
+            ])
             ->default()
             ->id('superadmin')
             ->path('superadmin')

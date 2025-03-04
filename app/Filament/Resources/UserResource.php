@@ -32,6 +32,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Admin';
 
+
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Pengguna'; // Setel ke bentuk singular
 
