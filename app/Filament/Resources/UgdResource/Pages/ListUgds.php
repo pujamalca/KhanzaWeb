@@ -10,10 +10,12 @@ class ListUgds extends ListRecords
 {
     protected static string $resource = UgdResource::class;
 
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),
         ];
+
     }
 }

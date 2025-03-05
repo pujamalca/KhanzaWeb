@@ -52,7 +52,7 @@ class UgdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-
+        ->searchable()
             ->columns([
                 //
             TextColumn::make('no_rkm_medis')
@@ -112,17 +112,14 @@ class UgdResource extends Resource
                 ->label('Status Lanjut')
                 ->sortable(),
 
-            TextColumn::make('kd_pj')
+            TextColumn::make('penjab.nama_perusahaan')
                 ->label('Kode PJ')
                 ->sortable(),
 
             TextColumn::make('umurdaftar')
-                ->label('Umur Pendaftar')
-                ->sortable(),
-
-            TextColumn::make('sttsumur')
-                ->label('Status Umur')
-                ->sortable(),
+                ->label('Umur')
+                ->sortable()
+                ->formatStateUsing(fn ($state,$record) => "{$record->umurdaftar} {$record->sttsumur}"),
 
             TextColumn::make('status_bayar')
                 ->label('Status Bayar')
@@ -137,12 +134,12 @@ class UgdResource extends Resource
                 DateRangeFilter::make('tgl_registrasi', 'Tanggal Registrasi'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
@@ -157,7 +154,7 @@ class UgdResource extends Resource
     {
         return [
             'index' => Pages\ListUgds::route('/'),
-            'create' => Pages\CreateUgd::route('/create'),
+            // 'create' => Pages\CreateUgd::route('/create'),
             'edit' => Pages\EditUgd::route('/{record}/edit'),
         ];
     }

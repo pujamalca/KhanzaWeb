@@ -8,5 +8,5 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateUgd extends CreateRecord
 {
-    protected static string $resource = UgdResource::class;
+    // protected static string $resource = UgdResource::class;
 }
