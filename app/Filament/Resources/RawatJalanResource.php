@@ -3,46 +3,46 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Filters\DateRangeFilter;
-use App\Filament\Resources\UgdResource\Pages;
-use App\Filament\Resources\UgdResource\RelationManagers;
+use App\Filament\Resources\RawatJalanResource\Pages;
+use App\Filament\Resources\RawatJalanResource\RelationManagers;
+use App\Models\RawatJalan;
 use App\Models\reg_periksa;
-use App\Models\Ugd;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Carbon;
 
-
-class UgdResource extends Resource
+class RawatJalanResource extends Resource
 {
     use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = reg_periksa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bolt';
+    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
-    {
-        return static::getEloquentQuery()?->count() ?? 0;
-    }
+{
+    return static::getEloquentQuery()?->count() ?? 0;
+}
+
 
     protected static ?string $navigationGroup = 'ERM';
 
     // protected static ?int $navigationSort = 0;
 
     // Label jamak, ganti dengan singular jika perlu
-    protected static ?string $pluralLabel = 'UGD'; // Setel ke bentuk singular
+    protected static ?string $pluralLabel = 'Rawat Jalan'; // Setel ke bentuk singular
 
     // Label seperti button new akan berubah
-    protected static ?string $label = 'UGD';
+    protected static ?string $label = 'Rawat Jalan';
 
     // title menu akan berubah
-    protected static ?string $navigationLabel = 'UGD';
+    protected static ?string $navigationLabel = 'Rawat Jalan';
 
     public static function form(Form $form): Form
     {
@@ -55,9 +55,7 @@ class UgdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->query(fn () => self::applyEloquentQuery(reg_periksa::query()))
-        // ->whereDate('tgl_registrasi', now()->toDateString()) // Pastikan filter harian ada di sini
-        ->searchable()
+            ->query(fn () => self::applyEloquentQuery(reg_periksa::query()))
             ->columns([
                 //
             TextColumn::make('no_rkm_medis')
@@ -139,16 +137,14 @@ class UgdResource extends Resource
                 DateRangeFilter::make('tgl_registrasi', 'Tanggal Registrasi'),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
-
-
 
     public static function getRelations(): array
     {
@@ -160,15 +156,9 @@ class UgdResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUgds::route('/'),
-            // 'create' => Pages\CreateUgd::route('/create'),
-            'edit' => Pages\EditUgd::route('/{record}/edit'),
+            'index' => Pages\ListRawatJalans::route('/'),
+            'create' => Pages\CreateRawatJalan::route('/create'),
+            'edit' => Pages\EditRawatJalan::route('/{record}/edit'),
         ];
     }
-
-        public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('kd_poli', 'IGDK');
-    }
-
 }

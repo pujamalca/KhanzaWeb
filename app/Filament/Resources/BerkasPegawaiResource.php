@@ -188,7 +188,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
     {
         return $table
             ->emptyStateHeading('Belum ada data')
-            ->query(static::applyEloquentQuery(berkas_pegawai::query())) // Terapkan filter berdasarkan NIK
+            ->query(fn () => self::applyEloquentQuery(berkas_pegawai::query()))
             ->columns([
                     Tables\Columns\TextColumn::make('nik')
                     ->sortable()

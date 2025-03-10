@@ -15,13 +15,18 @@ trait AppliesUserFilter
     public static function applyEloquentQuery(Builder $query): Builder
         {
             return $query
+
                 ->when(
-                    auth()->check() && !auth()->user()->can('view_master::berkas::pegawai'),
+                    auth()->check() && !auth()->user()->can('view_rawatjalan'),
                     fn ($query) => $query->where('kd_dokter', auth()->user()->username)
                 )
                 ->when(
                     auth()->check() && !auth()->user()->can('view_ugd'),
                     fn ($query) => $query->where('kd_dokter', auth()->user()->username)
+                )
+                ->when(
+                    auth()->check() && !auth()->user()->can('view_master::berkas::pegawai'),
+                    fn ($query) => $query->where('nik', auth()->user()->username)
                 );
         }
 
