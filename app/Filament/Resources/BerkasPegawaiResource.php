@@ -28,9 +28,11 @@ use Filament\Panel;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Log;
 use League\Flysystem\Visibility;
+use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
 
 class BerkasPegawaiResource extends Resource implements HasShieldPermissions
 {
+    use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = berkas_pegawai::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
@@ -248,16 +250,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
             ]);
     }
 
-    /**
- * Filter data hanya untuk user yang login, kecuali memiliki izin melihat semua.
- */
-public static function applyEloquentQuery(Builder $query): Builder
-{
-    return $query->when(
-        auth()->check() && !auth()->user()->can('view_master::berkas::pegawai'), // Jika user tidak punya izin lihat semua
-        fn ($query) => $query->where('nik', auth()->user()->username) // Filter hanya NIK yang sama
-    );
-}
+
 
     public static function getRelations(): array
     {

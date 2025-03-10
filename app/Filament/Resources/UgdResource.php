@@ -16,9 +16,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
+
 
 class UgdResource extends Resource
 {
+    use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = reg_periksa::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bolt';
@@ -52,6 +55,7 @@ class UgdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->query(fn () => self::applyEloquentQuery(reg_periksa::query()))
         ->searchable()
             ->columns([
                 //
@@ -142,6 +146,8 @@ class UgdResource extends Resource
                 // ]),
             ]);
     }
+
+
 
     public static function getRelations(): array
     {
