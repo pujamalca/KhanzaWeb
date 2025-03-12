@@ -38,9 +38,12 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
-        {
-            return static::getModel()::count();
-        }
+    {
+        $query = \App\Traits\AppliesUserFilter::applyEloquentQuery(static::getEloquentQuery(), (new static::$model())->getTable());
+
+        return $query->count();
+    }
+
 
     protected static ?string $navigationGroup = 'SDM';
 
