@@ -133,6 +133,8 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->label('NIK')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('roles.name')
+                    ->badge()
+                    ->separator(',')
                     ->label('Role')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')

@@ -26,9 +26,16 @@ class RawatJalanResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
-{
-    return static::getEloquentQuery()?->count() ?? 0;
-}
+    {
+        // Ambil query utama dari model
+        $query = static::getEloquentQuery();
+
+        // Terapkan filter yang sama seperti yang digunakan di table()
+        $query = (new static())->applyFiltersToQuery($query);
+
+        // Kembalikan jumlah data yang tampil setelah difilter
+        return $query->count();
+    }
 
 
     protected static ?string $navigationGroup = 'ERM';
@@ -55,7 +62,7 @@ class RawatJalanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(fn () => self::applyEloquentQuery(reg_periksa::query()))
+        ->query(static::applyEloquentQuery(reg_periksa::query(), 'reg_periksa'))
             ->columns([
                 //
             TextColumn::make('no_rkm_medis')

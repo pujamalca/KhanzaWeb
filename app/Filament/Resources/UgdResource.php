@@ -17,7 +17,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
-
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Log;
 
 class UgdResource extends Resource
 {
@@ -28,8 +29,16 @@ class UgdResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getEloquentQuery()?->count() ?? 0;
+        // Ambil query utama dari model
+        $query = static::getEloquentQuery();
+
+        // Terapkan filter yang sama seperti yang digunakan di table()
+        $query = (new static())->applyFiltersToQuery($query);
+
+        // Kembalikan jumlah data yang tampil setelah difilter
+        return $query->count();
     }
+
 
     protected static ?string $navigationGroup = 'ERM';
 
@@ -55,7 +64,7 @@ class UgdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->query(fn () => self::applyEloquentQuery(reg_periksa::query()))
+        ->query(static::applyEloquentQuery(reg_periksa::query(), 'reg_periksa'))
         // ->whereDate('tgl_registrasi', now()->toDateString()) // Pastikan filter harian ada di sini
         ->searchable()
             ->columns([
