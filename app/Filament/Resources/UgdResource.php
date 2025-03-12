@@ -58,6 +58,72 @@ class UgdResource extends Resource
         return $form
             ->schema([
                 //
+                Forms\Components\Select::make('no_rkm_medis')
+                ->label('Nomor Rekam Medis')
+                ->options(\App\Models\Pasien::pluck('no_rkm_medis', 'no_rkm_medis')) // Ambil dari tabel pasien
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Select::make('kd_poli')
+                ->label('Poliklinik')
+                ->options(\App\Models\Poliklinik::pluck('nm_poli', 'kd_poli')) // Ambil dari tabel poliklinik
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Select::make('kd_dokter')
+                ->label('Dokter')
+                ->options(\App\Models\Dokter::pluck('nm_dokter', 'kd_dokter')) // Ambil dari tabel dokter
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Select::make('kd_pj')
+                ->label('Penanggung Jawab')
+                ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj')) // Ambil dari tabel penjab
+                ->searchable()
+                ->required(),
+
+            Forms\Components\DatePicker::make('tgl_registrasi')
+                ->label('Tanggal Registrasi')
+                ->required(),
+
+            Forms\Components\TimePicker::make('jam_reg')
+                ->label('Jam Registrasi')
+                ->required(),
+
+            Forms\Components\TextInput::make('p_jawab')
+                ->label('Penanggung Jawab')
+                ->required(),
+
+            Forms\Components\Textarea::make('almt_pj')
+                ->label('Alamat Penanggung Jawab')
+                ->required(),
+
+            Forms\Components\TextInput::make('hubunganpj')
+                ->label('Hubungan Penanggung Jawab')
+                ->required(),
+
+            Forms\Components\Select::make('stts')
+                ->label('Status')
+                ->options([
+                    'Belum' => 'Belum',
+                    'Sudah' => 'Sudah',
+                ])
+                ->required(),
+
+            Forms\Components\Select::make('stts_daftar')
+                ->label('Status Daftar')
+                ->options([
+                    '-' => '-',
+                    'L' => 'L',
+                ])
+                ->required(),
+
+            Forms\Components\Select::make('status_lanjut')
+                ->label('Status Lanjut')
+                ->options([
+                    'Ralan' => 'Ralan',
+                ])
+                ->required(),
             ]);
     }
 
