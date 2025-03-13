@@ -61,41 +61,88 @@ class UgdResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Checkbox::make('auto_generate_no_reg')
+                ->label('Otomatis No. Reg')
+                ->default(true)
+                ->reactive(), // Agar langsung update saat diubah
+
+            Forms\Components\TextInput::make('no_reg')
+                ->label('No. Reg.')
+                ->default(fn ($get) => $get('auto_generate_no_reg') ? str_pad(
+                    (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString()) // Hanya data hari ini
+                        ->where('kd_poli', $get('kd_poli') ?? 'IGDK') // Gunakan kd_poli dari form
+                        ->max('no_reg') + 1, // Ambil no_reg terakhir dari poli yang sama
+                    3, '0', STR_PAD_LEFT // Format tiga digit: 001, 002, 003
+                ) : null) // Jika manual, biarkan kosong
+                ->live() // Supaya otomatis diperbarui ketika kd_poli berubah
+                ->disabled(fn ($get) => $get('auto_generate_no_reg') === true) // Bisa diedit jika checkbox mati
+                ->required(),
+
+            Forms\Components\TextInput::make('no_rawat')
+                ->label('No. Rawat')
+                ->default(fn () => now()->format('Y/m/d') . '/' . str_pad(
+                    (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count() + 1,
+                    6, '0', STR_PAD_LEFT
+                )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
+                ->required(),
+
                 Forms\Components\Select::make('no_rkm_medis')
-                ->label('Nomor Rekam Medis')
-                ->options(\App\Models\Pasien::pluck('no_rkm_medis', 'no_rkm_medis')) // Ambil dari tabel pasien
+                ->label('Nomor RM - Nama')
+                ->options(
+                    \App\Models\Pasien::select('no_rkm_medis', 'nm_pasien')
+                        ->limit(100) // Batasi hanya 100 data pertama
+                        ->get()
+                        ->mapWithKeys(fn ($pasien) => [
+                            $pasien->no_rkm_medis => "{$pasien->no_rkm_medis} - {$pasien->nm_pasien}"
+                        ])
+                )
                 ->searchable()
+                ->getSearchResultsUsing(fn (string $search) =>
+                    \App\Models\Pasien::where('no_rkm_medis', 'like', "%{$search}%")
+                        ->orWhere('nm_pasien', 'like', "%{$search}%")
+                        ->limit(100)
+                        ->get()
+                        ->mapWithKeys(fn ($pasien) => [
+                            $pasien->no_rkm_medis => "{$pasien->no_rkm_medis} - {$pasien->nm_pasien}"
+                        ])
+                )
+                ->reactive() // 🔹 Reactively update p_jawab
+                ->afterStateUpdated(fn ($set, $state) => $set('p_jawab',
+                    \App\Models\Pasien::where('no_rkm_medis', $state)->value('namakeluarga') ?? ''
+                ))
+                ->required(),
+
+            Forms\Components\TextInput::make('p_jawab')
+                ->label('Penanggung Jawab')
+                ->disabled() // Supaya tidak bisa diedit manual
                 ->required(),
 
             Forms\Components\Select::make('kd_poli')
                 ->label('Poliklinik')
-                ->options(\App\Models\Poliklinik::pluck('nm_poli', 'kd_poli')) // Ambil dari tabel poliklinik
-                ->searchable()
-                ->required(),
+                ->options(\App\Models\Poliklinik::where('kd_poli', 'like', '%IGD%')->pluck('nm_poli', 'kd_poli'))
+                ->default('IGDK') // Default ke IGDK
+                ->disabled(), // Tidak bisa diganti
 
             Forms\Components\Select::make('kd_dokter')
                 ->label('Dokter')
-                ->options(\App\Models\Dokter::pluck('nm_dokter', 'kd_dokter')) // Ambil dari tabel dokter
+                ->options(\App\Models\Dokter::pluck('nm_dokter', 'kd_dokter'))
                 ->searchable()
                 ->required(),
 
             Forms\Components\Select::make('kd_pj')
                 ->label('Penanggung Jawab')
-                ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj')) // Ambil dari tabel penjab
+                ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj'))
                 ->searchable()
                 ->required(),
 
             Forms\Components\DatePicker::make('tgl_registrasi')
                 ->label('Tanggal Registrasi')
+                ->default(now()->toDateString())
                 ->required(),
 
             Forms\Components\TimePicker::make('jam_reg')
                 ->label('Jam Registrasi')
-                ->required(),
-
-            Forms\Components\TextInput::make('p_jawab')
-                ->label('Penanggung Jawab')
+                ->default(now()->format('H:i:s'))
                 ->required(),
 
             Forms\Components\Textarea::make('almt_pj')
