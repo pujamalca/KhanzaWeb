@@ -14,6 +14,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -131,6 +132,9 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->searchable(),
                 Tables\Columns\TextColumn::make('username')
                     ->label('NIK')
+                    ->copyable()
+                    ->copyMessage('Username copied')
+                    ->copyMessageDuration(1500)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->badge()
@@ -197,8 +201,10 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\DeleteAction::make(),
 
 
-                ]),
-            ])
+                ])
+                ->button()
+                ->label('Menu'),
+            ],position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

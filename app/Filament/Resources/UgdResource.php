@@ -7,6 +7,7 @@ use App\Filament\Resources\UgdResource\Pages;
 use App\Filament\Resources\UgdResource\RelationManagers;
 use App\Models\reg_periksa;
 use App\Models\Ugd;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +18,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
+use Filament\Actions\Modal\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Tables\Enums\ActionsPosition;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UgdResource extends Resource
@@ -214,8 +218,18 @@ class UgdResource extends Resource
                 DateRangeFilter::make('tgl_registrasi', 'Tanggal Registrasi'),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                    ->url(fn (reg_periksa $record) => route(
+                        'filament.superadmin.resources.ugds.edit',
+                        ['record' => str_replace('/', '-', $record->no_rawat)] // Ganti "/" jadi "-"
+                    )),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->button()
+                ->label('Menu'),
+            ],position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
                 //     Tables\Actions\DeleteBulkAction::make(),
@@ -236,8 +250,8 @@ class UgdResource extends Resource
     {
         return [
             'index' => Pages\ListUgds::route('/'),
-            // 'create' => Pages\CreateUgd::route('/create'),
-            'edit' => Pages\EditUgd::route('/{record}/edit'),
+            'create' => Pages\CreateUgd::route('/create'),
+            'edit' => Pages\EditUgd::route('/{record}'),
         ];
     }
 
