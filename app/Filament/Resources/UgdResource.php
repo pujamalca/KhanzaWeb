@@ -181,9 +181,13 @@ class UgdResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->query(static::applyEloquentQuery(reg_periksa::query(), 'reg_periksa'))
-        // ->whereDate('tgl_registrasi', now()->toDateString()) // Pastikan filter harian ada di sini
-        ->searchable()
+            ->query(
+                static::applyEloquentQuery(
+                    reg_periksa::query()->where('kd_poli', 'IGDK'), // Filter IGDK di query utama
+                    'reg_periksa'
+                )
+            )
+            ->searchable()
             ->columns([
                 //
             TextColumn::make('no_rkm_medis')

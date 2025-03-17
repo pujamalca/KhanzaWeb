@@ -45,6 +45,19 @@ class reg_periksa extends Model
         'status_poli',
     ];
 
+    // di app/Models/reg_periksa.php
+    public function ranap_gabung()
+    {
+        return $this->hasMany(ranap_gabung::class, 'no_rawat', 'no_rawat');
+    }
+
+
+    public function kamar_inap()
+    {
+        return $this->hasOne(kamar_inap::class, 'no_rawat', 'no_rawat');
+    }
+
+
     /**
      * Relasi ke tabel dokter
      */
