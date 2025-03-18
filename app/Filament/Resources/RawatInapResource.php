@@ -89,12 +89,12 @@ class RawatInapResource extends Resource
                     ->sortable()
                     ->formatStateUsing(fn ($state, $record) => \Carbon\Carbon::parse($state)->format('d-m-Y') . ' ' . $record->jam_reg),
 
-                TextColumn::make('dokter.nm_dokter')
+                TextColumn::make('nm_dokter')
                     ->label('Dokter')
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('poliklinik.nm_poli')
+                TextColumn::make('nm_poli')
                     ->label('Poli')
                     ->sortable()
                     ->searchable(),
@@ -156,41 +156,73 @@ class RawatInapResource extends Resource
 
     public static function customQuery(): Builder
     {
-        $query1 = reg_periksa::select(
-            'reg_periksa.no_rawat',
-            'reg_periksa.no_rkm_medis',
-            'pasien.nm_pasien',
-            'reg_periksa.tgl_registrasi',
-            DB::raw('NULL as bayi')
-        )
-        ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis')
-        ->where('reg_periksa.status_lanjut', 'Ranap')
-        ->whereExists(function($query) {
-            $query->select(DB::raw(1))
-                  ->from('kamar_inap')
-                  ->whereColumn('kamar_inap.no_rawat', 'reg_periksa.no_rawat')
-                  ->where('stts_pulang', '-');
-        });
+        $query1 = reg_periksa::query()
+            ->select(
+                'reg_periksa.no_rawat',
+                'reg_periksa.no_rkm_medis',
+                'pasien.nm_pasien',
+                'reg_periksa.tgl_registrasi',
+                'reg_periksa.jam_reg',
+                'dokter.nm_dokter',
+                'poliklinik.nm_poli',
+                'penjab.nama_perusahaan',
+                'reg_periksa.p_jawab',
+                'reg_periksa.almt_pj',
+                'reg_periksa.hubunganpj',
+                'reg_periksa.stts',
+                'reg_periksa.stts_daftar',
+                'reg_periksa.status_lanjut',
+                'reg_periksa.umurdaftar',
+                'reg_periksa.sttsumur',
+                'reg_periksa.status_bayar',
+                'reg_periksa.status_poli',
+                DB::raw('NULL as bayi')
+            )
+            ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis')
+            ->leftJoin('dokter', 'dokter.kd_dokter', '=', 'reg_periksa.kd_dokter')
+            ->leftJoin('poliklinik', 'poliklinik.kd_poli', '=', 'reg_periksa.kd_poli')
+            ->leftJoin('penjab', 'penjab.kd_pj', '=', 'reg_periksa.kd_pj')
+            ->where('reg_periksa.status_lanjut', 'Ranap')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('kamar_inap')
+                    ->whereColumn('kamar_inap.no_rawat', 'reg_periksa.no_rawat')
+                    ->where('stts_pulang', '-');
+            });
 
-        $query2 = ranap_gabung::select(
-            'reg_periksa.no_rawat',
-            'reg_periksa.no_rkm_medis',
-            'pasien.nm_pasien',
-            'reg_periksa.tgl_registrasi',
-            DB::raw("CONCAT('Gabung: ', reg_periksa.no_rawat) as bayi")
-        )
-        ->join('reg_periksa', 'reg_periksa.no_rawat', '=', 'ranap_gabung.no_rawat2')
-        ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis');
+        $query2 = ranap_gabung::query()
+            ->select(
+                'reg_periksa.no_rawat',
+                'reg_periksa.no_rkm_medis',
+                'pasien.nm_pasien',
+                'reg_periksa.tgl_registrasi',
+                'reg_periksa.jam_reg',
+                'dokter.nm_dokter',
+                'poliklinik.nm_poli',
+                'penjab.nama_perusahaan',
+                'reg_periksa.p_jawab',
+                'reg_periksa.almt_pj',
+                'reg_periksa.hubunganpj',
+                'reg_periksa.stts',
+                'reg_periksa.stts_daftar',
+                'reg_periksa.status_lanjut',
+                'reg_periksa.umurdaftar',
+                'reg_periksa.sttsumur',
+                'reg_periksa.status_bayar',
+                'reg_periksa.status_poli',
+                DB::raw("CONCAT('Gabung: ', reg_periksa.no_rawat) as bayi")
+            )
+            ->join('reg_periksa', 'reg_periksa.no_rawat', '=', 'ranap_gabung.no_rawat2')
+            ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis')
+            ->leftJoin('dokter', 'dokter.kd_dokter', '=', 'reg_periksa.kd_dokter')
+            ->leftJoin('poliklinik', 'poliklinik.kd_poli', '=', 'reg_periksa.kd_poli')
+            ->leftJoin('penjab', 'penjab.kd_pj', '=', 'reg_periksa.kd_pj');
 
-        // UNION ALL with bindings
-        $union = $query1->unionAll($query2);
-
-        // Wrap the union query in Eloquent Builder
-        $final = reg_periksa::query()
-            ->fromSub($union, 'combined')
+        $combinedQuery = reg_periksa::query()
+            ->fromSub($query1->unionAll($query2), 'combined')
             ->orderBy('combined.no_rawat');
 
-        return $final;
+        return $combinedQuery;
     }
 
     public static function getRelations(): array
