@@ -85,7 +85,6 @@ class RawatJalanResource extends Resource
                 ->sortable()
                 ->formatStateUsing(fn ($state, $record) => \Carbon\Carbon::parse($state)->format('d-m-Y') . ' ' . $record->jam_reg),
 
-
             TextColumn::make('dokter.nm_dokter')
                 ->label('Dokter')
                 ->sortable()
@@ -108,7 +107,6 @@ class RawatJalanResource extends Resource
             TextColumn::make('hubunganpj')
                 ->label('Hubungan PJ')
                 ->sortable(),
-
 
             TextColumn::make('stts')
                 ->label('Status')

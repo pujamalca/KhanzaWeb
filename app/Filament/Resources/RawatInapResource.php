@@ -62,86 +62,84 @@ class RawatInapResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->query(static::customQuery())
-        ->searchable()
+            ->query(static::customQuery())
+            ->searchable()
             ->columns([
                 TextColumn::make('no_rkm_medis')
-                ->label('No.RM')
-                ->sortable()
-                ->searchable(),
+                    ->label('No.RM')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('no_rawat')
-                ->label('No. Rawat')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('no_rawat')
+                    ->label('No. Rawat')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('bayi')
-                ->label('Bayi Gabung')
-                ->formatStateUsing(fn($state, $record) => $record->bayi ?? '-'),
+                TextColumn::make('bayi')
+                    ->label('Bayi Gabung')
+                    ->formatStateUsing(fn($state, $record) => $record->bayi ?? '-'),
 
-            TextColumn::make('pasien.nm_pasien')
-                ->label('Nama Pasien')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('pasien.nm_pasien')
+                    ->label('Nama Pasien')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('tgl_registrasi')
-                ->label('Waktu')
-                ->sortable()
-                ->formatStateUsing(fn ($state, $record) => \Carbon\Carbon::parse($state)->format('d-m-Y') . ' ' . $record->jam_reg),
+                TextColumn::make('tgl_registrasi')
+                    ->label('Waktu')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => \Carbon\Carbon::parse($state)->format('d-m-Y') . ' ' . $record->jam_reg),
 
+                TextColumn::make('dokter.nm_dokter')
+                    ->label('Dokter')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('dokter.nm_dokter')
-                ->label('Dokter')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('poliklinik.nm_poli')
+                    ->label('Poli')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('poliklinik.nm_poli')
-                ->label('Poli')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('p_jawab')
+                    ->label('PJ')
+                    ->sortable()
+                    ->searchable(),
 
-            TextColumn::make('p_jawab')
-                ->label('PJ')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('almt_pj')
+                    ->label('Alamat PJ')
+                    ->sortable(),
 
-            TextColumn::make('almt_pj')
-                ->label('Alamat PJ')
-                ->sortable(),
+                TextColumn::make('hubunganpj')
+                    ->label('Hubungan PJ')
+                    ->sortable(),
 
-            TextColumn::make('hubunganpj')
-                ->label('Hubungan PJ')
-                ->sortable(),
+                TextColumn::make('stts')
+                    ->label('Status')
+                    ->sortable(),
 
+                TextColumn::make('stts_daftar')
+                    ->label('Status Daftar')
+                    ->sortable(),
 
-            TextColumn::make('stts')
-                ->label('Status')
-                ->sortable(),
+                TextColumn::make('status_lanjut')
+                    ->label('Status Lanjut')
+                    ->sortable(),
 
-            TextColumn::make('stts_daftar')
-                ->label('Status Daftar')
-                ->sortable(),
+                TextColumn::make('penjab.nama_perusahaan')
+                    ->label('Kode PJ')
+                    ->sortable(),
 
-            TextColumn::make('status_lanjut')
-                ->label('Status Lanjut')
-                ->sortable(),
+                TextColumn::make('umurdaftar')
+                    ->label('Umur')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state,$record) => "{$record->umurdaftar} {$record->sttsumur}"),
 
-            TextColumn::make('penjab.nama_perusahaan')
-                ->label('Kode PJ')
-                ->sortable(),
+                TextColumn::make('status_bayar')
+                    ->label('Status Bayar')
+                    ->sortable(),
 
-            TextColumn::make('umurdaftar')
-                ->label('Umur')
-                ->sortable()
-                ->formatStateUsing(fn ($state,$record) => "{$record->umurdaftar} {$record->sttsumur}"),
-
-            TextColumn::make('status_bayar')
-                ->label('Status Bayar')
-                ->sortable(),
-
-            TextColumn::make('status_poli')
-                ->label('Status Poli')
-                ->sortable(),
+                TextColumn::make('status_poli')
+                    ->label('Status Poli')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -167,8 +165,11 @@ class RawatInapResource extends Resource
         )
         ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis')
         ->where('reg_periksa.status_lanjut', 'Ranap')
-        ->whereHas('kamar_inap', function ($query) {
-            $query->where('stts_pulang', '-');
+        ->whereExists(function($query) {
+            $query->select(DB::raw(1))
+                  ->from('kamar_inap')
+                  ->whereColumn('kamar_inap.no_rawat', 'reg_periksa.no_rawat')
+                  ->where('stts_pulang', '-');
         });
 
         $query2 = ranap_gabung::select(
@@ -181,14 +182,16 @@ class RawatInapResource extends Resource
         ->join('reg_periksa', 'reg_periksa.no_rawat', '=', 'ranap_gabung.no_rawat2')
         ->join('pasien', 'pasien.no_rkm_medis', '=', 'reg_periksa.no_rkm_medis');
 
-        // Use subquery and wrap with DB::table, then convert to Eloquent
-        $unionQuery = DB::table(DB::raw("({$query1->toSql()} UNION ALL {$query2->toSql()}) as combined"))
-            ->mergeBindings($query1->getQuery())
-            ->mergeBindings($query2->getQuery());
+        // UNION ALL with bindings
+        $union = $query1->unionAll($query2);
 
-        return reg_periksa::query()->fromSub($unionQuery, 'combined');
+        // Wrap the union query in Eloquent Builder
+        $final = reg_periksa::query()
+            ->fromSub($union, 'combined')
+            ->orderBy('combined.no_rawat');
+
+        return $final;
     }
-
 
     public static function getRelations(): array
     {

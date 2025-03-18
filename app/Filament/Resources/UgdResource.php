@@ -210,7 +210,6 @@ class UgdResource extends Resource
                 ->sortable()
                 ->formatStateUsing(fn ($state, $record) => \Carbon\Carbon::parse($state)->format('d-m-Y') . ' ' . $record->jam_reg),
 
-
             TextColumn::make('dokter.nm_dokter')
                 ->label('Dokter')
                 ->sortable()
@@ -233,7 +232,6 @@ class UgdResource extends Resource
             TextColumn::make('hubunganpj')
                 ->label('Hubungan PJ')
                 ->sortable(),
-
 
             TextColumn::make('stts')
                 ->label('Status')
@@ -307,8 +305,8 @@ class UgdResource extends Resource
     }
 
         public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('kd_poli', 'IGDK');
-    }
+        {
+            return parent::getEloquentQuery()->where('kd_poli', 'IGDK');
+        }
 
 }
