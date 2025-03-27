@@ -81,7 +81,7 @@ class TrackersqlResource extends Resource
                 ->sortable()
                 ->searchable(isIndividual:True)
                 ->wrap() // Menggunakan properti wrap() jika tersedia atau kustomisasi
-                ->extraAttributes(['style' => ' white-space: normal; word-wrap: break-word;']),
+                ->extraAttributes(['style' => 'white-space: normal; word-wrap: break-word; word-break: break-all;']),
 
             ])
             ->defaultSort('tanggal', 'desc')
