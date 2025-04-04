@@ -21,14 +21,16 @@ class LogDatabaseQuery
 
         // Gantikan placeholder ? dengan data yang sebenarnya
         $bindings = $event->bindings;
+        
         foreach ($bindings as $binding) {
             // Escape karakter khusus pada binding
             $binding = is_string($binding) ? "'$binding'" : $binding;
+
             // Gantikan tanda ? dengan binding yang sesuai
             if (!is_null($binding)) {
+                // Secara berurutan mengganti placeholder ? dengan nilai yang sesuai
                 $query = preg_replace('/\?/', $binding, $query, 1);
             }
-
         }
 
         // Cek apakah query adalah `INSERT`, `UPDATE`, atau `DELETE`
@@ -75,8 +77,6 @@ class LogDatabaseQuery
                 $sqle = $ipAddress . ' ' . strtoupper($event->connectionName) . ' ' . $query;
             }
 
-            $sqle = $event->sql; // Mendefinisikan variabel $sqle dengan query yang dieksekusi
-
             // Catat ke tabel trackersql
             DB::table('trackersql')->insert([
                 'tanggal' => now(),
@@ -107,5 +107,3 @@ class LogDatabaseQuery
         return false;
     }
 }
-
-
