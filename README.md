@@ -4,7 +4,7 @@ KhanzaWeb adalah proyek berbasis Laravel yang dapat digunakan untuk membangun ap
 
 ## Persyaratan Sistem
 Pastikan Anda telah menginstal persyaratan berikut sebelum menjalankan proyek ini:
-- PHP (>= 8.1)
+- PHP (>= 8.2)
 - Composer
 - MySQL atau database lain yang didukung Laravel
 - Ekstensi PHP yang diperlukan: OpenSSL, PDO, Mbstring, Tokenizer, XML, Ctype, JSON
@@ -50,19 +50,36 @@ Kemudian jalankan migrasi untuk membuat tabel-tabel database:
 ```bash
 php artisan migrate
 ```
+### 6. Lalu Jalankan
+Jalankan db:seed untuk mengisi data:
+```bash
+php artisan db:seed
+```
+Aplikasi sekarang sudah mengisi database yg diperlukan.
 
-### 6. Menjalankan Aplikasi
+### 7. Lalu Jalankan generate all
+Jalankan generate untuk mengisi data filament shield:
+```bash
+php artisan shield:generate --all
+```
+Aplikasi sekarang sudah mengisi database yg diperlukan.
+
+### 7. Lalu Jalankan super-admin
+Jalankan super-admin untuk mengisi admin filament shield:
+```bash
+php artisan shield:super-admin
+```
+Aplikasi sekarang sudah mengisi akses yg diperlukan.
+
+
+### 8. Menjalankan Aplikasi
 Jalankan server lokal untuk mengakses aplikasi:
 ```bash
 php artisan serve
 ```
 Aplikasi sekarang dapat diakses di `http://localhost:8000`.
 
-## Pengujian
-Untuk menjalankan pengujian unit dan fitur, gunakan perintah berikut:
-```bash
-php artisan test
-```
+
 
 ## Lisensi
 Proyek ini berada di bawah lisensi MIT. Silakan lihat file `LICENSE` untuk detail lebih lanjut.
