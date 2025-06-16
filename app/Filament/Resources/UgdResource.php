@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
 use Filament\Actions\Modal\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -57,26 +58,82 @@ class UgdResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'UGD';
 
+    public static function mutateFormDataBeforeCreate(array $data): array
+        {
+            // Pastikan jam_registrasi tidak null
+            $datetime = isset($data['jam_registrasi']) ? Carbon::parse($data['jam_registrasi']) : now();
+            $data['tgl_registrasi'] = $datetime->toDateString();
+            $data['jam_reg'] = $datetime->format('H:i:s');
+            unset($data['jam_registrasi']);
+
+            // Pastikan no_reg tetap diisi jika tidak dikirim karena disabled
+            if (empty($data['no_reg']) && !empty($data['auto_generate_no_reg'])) {
+                $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', $data['tgl_registrasi'] ?? now()->toDateString())
+                    ->where('kd_poli', $data['kd_poli'] ?? 'IGDK')
+                    ->max('no_reg');
+
+                $data['no_reg'] = str_pad(((int)$last) + 1, 3, '0', STR_PAD_LEFT);
+            }
+
+            // no_rawat
+            if (empty($data['no_rawat'])) {
+                $countToday = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count();
+                $data['no_rawat'] = now()->format('Y/m/d') . '/' . str_pad($countToday + 1, 6, '0', STR_PAD_LEFT);
+            }
+
+                        // Cek status daftar (lama / baru)
+            $data['stts_daftar'] = \App\Models\reg_periksa::where('no_rkm_medis', $data['no_rkm_medis'])->exists()
+                ? 'Lama'
+                : 'Baru';
+
+            // Ambil dari poliklinik
+            $poli = \App\Models\Poliklinik::where('kd_poli', $data['kd_poli'])->first();
+            if ($poli) {
+                $data['biaya_reg'] = $data['stts_daftar'] === 'Baru'
+                    ? $poli->registrasi
+                    : $poli->registrasilama;
+            }
+
+            // Ambil data dari pasien
+            $pasien = \App\Models\Pasien::where('no_rkm_medis', $data['no_rkm_medis'])->first();
+            if ($pasien) {
+                $data['p_jawab'] = $pasien->namakeluarga ?? '-';
+                $data['almt_pj'] = $pasien->alamat ?? '-';
+                $data['hubunganpj'] = $pasien->keluarga ?? '-';
+                $data['umurdaftar'] = $pasien->umur ?? '0';
+                $data['sttsumur'] = $pasien->sttsumur ?? 'Th';
+            }
+
+            // Set default status lain
+            $data['stts'] = 'Belum';
+            $data['status_lanjut'] = 'Ralan';
+
+            return $data;
+        }
+
+
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Checkbox::make('auto_generate_no_reg')
-                ->label('Otomatis No. Reg')
-                ->default(true)
-                ->reactive(), // Agar langsung update saat diubah
-
             Forms\Components\TextInput::make('no_reg')
                 ->label('No. Reg.')
-                ->default(fn ($get) => $get('auto_generate_no_reg') ? str_pad(
-                    (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString()) // Hanya data hari ini
-                        ->where('kd_poli', $get('kd_poli') ?? 'IGDK') // Gunakan kd_poli dari form
-                        ->max('no_reg') + 1, // Ambil no_reg terakhir dari poli yang sama
-                    3, '0', STR_PAD_LEFT // Format tiga digit: 001, 002, 003
-                ) : null) // Jika manual, biarkan kosong
-                ->live() // Supaya otomatis diperbarui ketika kd_poli berubah
-                ->disabled(fn ($get) => $get('auto_generate_no_reg') === true) // Bisa diedit jika checkbox mati
+                ->reactive()
+                ->default(function ($get) {
+                    
+            
+                    $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
+                        ->where('kd_poli', $get('kd_poli') ?? 'IGDK')
+                        ->max('no_reg');
+            
+                    return str_pad(((int)$last) + 1, 3, '0', STR_PAD_LEFT);
+                })
+                ->readOnly(fn ($get) => $get('auto_generate_no_reg') === true) // ✅ Ganti disabled jadi readOnly
                 ->required(),
+            
+            
+            
 
             Forms\Components\TextInput::make('no_rawat')
                 ->label('No. Rawat')
@@ -86,11 +143,11 @@ class UgdResource extends Resource
                 )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
                 ->required(),
 
-                Forms\Components\Select::make('no_rkm_medis')
+            Forms\Components\Select::make('no_rkm_medis')
                 ->label('Nomor RM - Nama')
                 ->options(
                     \App\Models\Pasien::select('no_rkm_medis', 'nm_pasien')
-                        ->limit(100) // Batasi hanya 100 data pertama
+                        ->limit(100)
                         ->get()
                         ->mapWithKeys(fn ($pasien) => [
                             $pasien->no_rkm_medis => "{$pasien->no_rkm_medis} - {$pasien->nm_pasien}"
@@ -106,22 +163,44 @@ class UgdResource extends Resource
                             $pasien->no_rkm_medis => "{$pasien->no_rkm_medis} - {$pasien->nm_pasien}"
                         ])
                 )
-                ->reactive() // 🔹 Reactively update p_jawab
-                ->afterStateUpdated(fn ($set, $state) => $set('p_jawab',
-                    \App\Models\Pasien::where('no_rkm_medis', $state)->value('namakeluarga') ?? ''
-                ))
-                ->required(),
+                ->reactive()
+                ->afterStateUpdated(function ($set, $state) {
+                    $pasien = \App\Models\Pasien::where('no_rkm_medis', $state)->first();
+                    $set('p_jawab', $pasien->namakeluarga ?? '');
+                    $set('almt_pj', $pasien->alamat ?? '');
+                    $set('hubunganpj', $pasien->keluarga ?? '');
+            
+                    // 💡 Tambahkan ini untuk menentukan status daftar
+                    $sudahPernah = \App\Models\reg_periksa::where('no_rkm_medis', $state)->exists();
+                    $set('stts_daftar', $sudahPernah ? 'Lama' : 'Baru');
+                    // Cek umur dan set umurdaftar dan sttsumur
+                    $umur = (int) $pasien->umur; // diasumsikan integer tahun
+                    if ($umur >= 1) {
+                        $data['umurdaftar'] = $umur;
+                        $data['sttsumur'] = 'Th'; // Tahun
+                    } else {
+                        $data['umurdaftar'] = (int) $pasien->umurbulan; // misalnya 5 bulan
+                        $data['sttsumur'] = 'Bl'; // Bulan
+                    }
+                     // Cek status daftar (Lama/Baru secara umum)
+                    $pernahDaftar = \App\Models\reg_periksa::where('no_rkm_medis', $state)->exists();
+                    $set('stts_daftar', $pernahDaftar ? 'Lama' : 'Baru');
 
-            Forms\Components\TextInput::make('p_jawab')
-                ->label('Penanggung Jawab')
-                ->disabled() // Supaya tidak bisa diedit manual
+                    // Cek status poli (khusus ke poli yang sama, contoh: IGDK)
+                    $pernahDiPoli = \App\Models\reg_periksa::where('no_rkm_medis', $state)
+                        ->where('kd_poli', 'IGDK')
+                        ->exists();
+                    $set('status_poli', $pernahDiPoli ? 'Lama' : 'Baru');
+                })
                 ->required(),
+            
 
-            Forms\Components\Select::make('kd_poli')
+
+            Forms\Components\TextInput::make('kd_poli')
                 ->label('Poliklinik')
-                ->options(\App\Models\Poliklinik::where('kd_poli', 'like', '%IGD%')->pluck('nm_poli', 'kd_poli'))
-                ->default('IGDK') // Default ke IGDK
-                ->disabled(), // Tidak bisa diganti
+                ->default('IGDK')
+                ->dehydrated(), // <== WAJIB AGAR IKUT TERKIRIM
+            
 
             Forms\Components\Select::make('kd_dokter')
                 ->label('Dokter')
@@ -130,51 +209,49 @@ class UgdResource extends Resource
                 ->required(),
 
             Forms\Components\Select::make('kd_pj')
-                ->label('Penanggung Jawab')
+                ->label('Cara Bayar')
                 ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj'))
                 ->searchable()
                 ->required(),
 
             Forms\Components\DatePicker::make('tgl_registrasi')
                 ->label('Tanggal Registrasi')
-                ->default(now()->toDateString())
+                ->default(now())
                 ->required(),
-
+            
             Forms\Components\TimePicker::make('jam_reg')
                 ->label('Jam Registrasi')
-                ->default(now()->format('H:i:s'))
+                ->seconds(true)
+                ->default(now())
                 ->required(),
-
-            Forms\Components\Textarea::make('almt_pj')
-                ->label('Alamat Penanggung Jawab')
-                ->required(),
-
-            Forms\Components\TextInput::make('hubunganpj')
-                ->label('Hubungan Penanggung Jawab')
-                ->required(),
-
-            Forms\Components\Select::make('stts')
-                ->label('Status')
-                ->options([
-                    'Belum' => 'Belum',
-                    'Sudah' => 'Sudah',
-                ])
-                ->required(),
-
-            Forms\Components\Select::make('stts_daftar')
-                ->label('Status Daftar')
-                ->options([
-                    '-' => '-',
-                    'L' => 'L',
-                ])
-                ->required(),
-
-            Forms\Components\Select::make('status_lanjut')
-                ->label('Status Lanjut')
-                ->options([
-                    'Ralan' => 'Ralan',
-                ])
-                ->required(),
+            
+            
+                
+            Forms\Components\Hidden::make('p_jawab')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('almt_pj')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('hubunganpj')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('stts')
+                ->default('Belum')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('stts_daftar')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('status_lanjut')
+                ->default('Ralan')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('umurdaftar')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('sttsumur')
+                ->default('Th')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('status_bayar')
+                ->default('Belum Bayar')
+                ->dehydrated(),
+            Forms\Components\Hidden::make('biaya_reg')
+                ->dehydrated(),
+            
             ]);
     }
 
@@ -190,6 +267,11 @@ class UgdResource extends Resource
             ->searchable()
             ->columns([
                 //
+            TextColumn::make('no_reg')
+                ->label('No Reg')
+                ->sortable()
+                ->searchable(),
+            
             TextColumn::make('no_rkm_medis')
                 ->label('No.RM')
                 ->sortable()
@@ -245,7 +327,7 @@ class UgdResource extends Resource
                 ->label('Status Lanjut')
                 ->sortable(),
 
-            TextColumn::make('penjab.nama_perusahaan')
+            TextColumn::make('penjab.png_jawab')
                 ->label('Kode PJ')
                 ->sortable(),
 

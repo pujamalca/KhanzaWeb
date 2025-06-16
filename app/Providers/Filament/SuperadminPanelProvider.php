@@ -48,7 +48,7 @@ class SuperadminPanelProvider extends PanelProvider
             ->path('superadmin')
             //bisa hide di desktop
             ->sidebarCollapsibleOnDesktop()
-            ->favicon('/fadhila.png') // Tambahkan favicon di sini
+            ->favicon('/IDI.png') // Tambahkan favicon di sini
             ->login(CustomLogin::class)
             // ->logout(CustomLogoutController::class)
             ->userMenuItems([
