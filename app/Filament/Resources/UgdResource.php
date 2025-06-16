@@ -173,14 +173,20 @@ class UgdResource extends Resource
                     // 💡 Tambahkan ini untuk menentukan status daftar
                     $sudahPernah = \App\Models\reg_periksa::where('no_rkm_medis', $state)->exists();
                     $set('stts_daftar', $sudahPernah ? 'Lama' : 'Baru');
-                    // Cek umur dan set umurdaftar dan sttsumur
-                    $umur = (int) $pasien->umur; // diasumsikan integer tahun
-                    if ($umur >= 1) {
-                        $data['umurdaftar'] = $umur;
-                        $data['sttsumur'] = 'Th'; // Tahun
-                    } else {
-                        $data['umurdaftar'] = (int) $pasien->umurbulan; // misalnya 5 bulan
-                        $data['sttsumur'] = 'Bl'; // Bulan
+                     // **Tambahan: hitung dan set umur**
+                    if ($pasien && $pasien->tgl_lahir) {
+                        $birth = \Carbon\Carbon::parse($pasien->tgl_lahir);
+                        $years = $birth->diffInYears(now());
+                        if ($years >= 1) {
+                            $set('umurdaftar', $years);
+                            $set('sttsumur', 'Th');
+                        } else if (($months = $birth->diffInMonths(now())) >= 1) {
+                            $set('umurdaftar', $months);
+                            $set('sttsumur', 'Bl');
+                        } else {
+                            $set('umurdaftar', $birth->diffInDays(now()));
+                            $set('sttsumur', 'Hr');
+                        }
                     }
                      // Cek status daftar (Lama/Baru secara umum)
                     $pernahDaftar = \App\Models\reg_periksa::where('no_rkm_medis', $state)->exists();
@@ -244,7 +250,6 @@ class UgdResource extends Resource
             Forms\Components\Hidden::make('umurdaftar')
                 ->dehydrated(),
             Forms\Components\Hidden::make('sttsumur')
-                ->default('Th')
                 ->dehydrated(),
             Forms\Components\Hidden::make('status_bayar')
                 ->default('Belum Bayar')
