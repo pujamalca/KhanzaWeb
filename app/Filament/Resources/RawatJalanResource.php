@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Support\Carbon;
 
 class RawatJalanResource extends Resource
@@ -109,32 +110,6 @@ class RawatJalanResource extends Resource
         {
             return $form
                 ->schema([
-                Forms\Components\TextInput::make('no_reg')
-                    ->label('No. Reg.')
-                    ->reactive()
-                    ->default(function ($get) {
-                        
-                
-                        $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
-                            ->where('kd_poli', $get('kd_poli') ?? 'IGDK')
-                            ->max('no_reg');
-                
-                        return str_pad(((int)$last) + 1, 3, '0', STR_PAD_LEFT);
-                    })
-                    ->readOnly(fn ($get) => $get('auto_generate_no_reg') === true) // ✅ Ganti disabled jadi readOnly
-                    ->required(),
-                
-                
-                
-    
-                Forms\Components\TextInput::make('no_rawat')
-                    ->label('No. Rawat')
-                    ->default(fn () => now()->format('Y/m/d') . '/' . str_pad(
-                        (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count() + 1,
-                        6, '0', STR_PAD_LEFT
-                    )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
-                    ->required(),
-    
                 Forms\Components\Select::make('no_rkm_medis')
                     ->label('Nomor RM - Nama')
                     ->options(
@@ -194,10 +169,22 @@ class RawatJalanResource extends Resource
                 
     
     
-                Forms\Components\TextInput::make('kd_poli')
+                Forms\Components\Select::make('kd_poli')
                     ->label('Poliklinik')
-                    ->default('IGDK')
-                    ->dehydrated(), // <== WAJIB AGAR IKUT TERKIRIM
+                    ->options(\App\Models\Poliklinik::pluck('nm_poli', 'kd_poli'))
+                    ->searchable()
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($set, $state) {
+                        if ($state) {
+                            $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
+                                ->where('kd_poli', $state)
+                                ->max('no_reg');
+
+                            $next = str_pad(((int)$last) + 1, 3, '0', STR_PAD_LEFT);
+                            $set('no_reg', $next);
+                        }
+                    }),
                 
     
                 Forms\Components\Select::make('kd_dokter')
@@ -210,6 +197,31 @@ class RawatJalanResource extends Resource
                     ->label('Cara Bayar')
                     ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj'))
                     ->searchable()
+                    ->required(),
+                
+                Forms\Components\TextInput::make('no_reg')
+                    ->label('No. Reg.')
+                    ->reactive()
+                    ->default(function ($get) {
+                        $kdPoli = $get('kd_poli');
+                        if (!$kdPoli) return null;
+                
+                        $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
+                            ->where('kd_poli', $kdPoli)
+                            ->max('no_reg');
+                
+                        return str_pad(((int) $last) + 1, 3, '0', STR_PAD_LEFT);
+                    })
+                    ->required(),        
+                
+                
+    
+                Forms\Components\TextInput::make('no_rawat')
+                    ->label('No. Rawat')
+                    ->default(fn () => now()->format('Y/m/d') . '/' . str_pad(
+                        (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count() + 1,
+                        6, '0', STR_PAD_LEFT
+                    )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
                     ->required(),
     
                 Forms\Components\DatePicker::make('tgl_registrasi')
@@ -258,6 +270,11 @@ class RawatJalanResource extends Resource
         ->query(static::applyEloquentQuery(reg_periksa::query(), 'reg_periksa'))
             ->columns([
                 //
+            TextColumn::make('no_reg')
+                ->label('No Reg')
+                ->sortable()
+                ->searchable(),
+
             TextColumn::make('no_rkm_medis')
                 ->label('No.RM')
                 ->sortable()
@@ -335,8 +352,18 @@ class RawatJalanResource extends Resource
                 DateRangeFilter::make('tgl_registrasi', 'Tanggal Registrasi'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                    ->url(fn (reg_periksa $record) => route(
+                        'filament.superadmin.resources.ugds.edit',
+                        ['record' => str_replace('/', '-', $record->no_rawat)] // Ganti "/" jadi "-"
+                    )),
+
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->button()
+                ->label('Menu'),
+            ],position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

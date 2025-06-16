@@ -117,32 +117,6 @@ class UgdResource extends Resource
     {
         return $form
             ->schema([
-            Forms\Components\TextInput::make('no_reg')
-                ->label('No. Reg.')
-                ->reactive()
-                ->default(function ($get) {
-                    
-            
-                    $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
-                        ->where('kd_poli', $get('kd_poli') ?? 'IGDK')
-                        ->max('no_reg');
-            
-                    return str_pad(((int)$last) + 1, 3, '0', STR_PAD_LEFT);
-                })
-                ->readOnly(fn ($get) => $get('auto_generate_no_reg') === true) // ✅ Ganti disabled jadi readOnly
-                ->required(),
-            
-            
-            
-
-            Forms\Components\TextInput::make('no_rawat')
-                ->label('No. Rawat')
-                ->default(fn () => now()->format('Y/m/d') . '/' . str_pad(
-                    (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count() + 1,
-                    6, '0', STR_PAD_LEFT
-                )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
-                ->required(),
-
             Forms\Components\Select::make('no_rkm_medis')
                 ->label('Nomor RM - Nama')
                 ->options(
@@ -218,6 +192,31 @@ class UgdResource extends Resource
                 ->label('Cara Bayar')
                 ->options(\App\Models\Penjab::pluck('png_jawab', 'kd_pj'))
                 ->searchable()
+                ->required(),
+            
+            Forms\Components\TextInput::make('no_reg')
+                ->label('No. Reg.')
+                ->reactive()
+                ->default(function ($get) {
+                    $kdPoli = $get('kd_poli');
+                    if (!$kdPoli) return null;
+            
+                    $last = \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())
+                        ->where('kd_poli', $kdPoli)
+                        ->max('no_reg');
+            
+                    return str_pad(((int) $last) + 1, 3, '0', STR_PAD_LEFT);
+                })
+                ->required(),        
+            
+            
+
+            Forms\Components\TextInput::make('no_rawat')
+                ->label('No. Rawat')
+                ->default(fn () => now()->format('Y/m/d') . '/' . str_pad(
+                    (int) \App\Models\reg_periksa::whereDate('tgl_registrasi', now()->toDateString())->count() + 1,
+                    6, '0', STR_PAD_LEFT
+                )) // Format YYYY/MM/DD/000XXX, berdasarkan jumlah rawat hari ini
                 ->required(),
 
             Forms\Components\DatePicker::make('tgl_registrasi')
