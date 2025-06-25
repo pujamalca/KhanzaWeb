@@ -15,6 +15,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\AppliesUserFilter; // 🔹 Tambahkan ini
+use Filament\Actions\Action;
+use Filament\Tables\Actions\Action as ActionsAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Support\Carbon;
@@ -360,6 +362,39 @@ class RawatJalanResource extends Resource
                     )),
 
                     Tables\Actions\DeleteAction::make(),
+                    Action::make('rawatInap')
+                        ->label('Rawat Inap')
+                        ->icon('heroicon-o-plus-circle') // tersedia default
+                        ->color('success')
+                        ->visible(fn ($record) => !$record->kamarInap) // hanya jika belum diranapkan
+                        ->form([
+                            Forms\Components\Select::make('kd_kamar')
+                                ->label('Pilih Kamar')
+                                ->relationship('kamar', 'nm_kamar')
+                                ->searchable()
+                                ->required(),
+                            Forms\Components\TextInput::make('diagnosa_awal')
+                                ->label('Diagnosa Awal')
+                                ->required(),
+                            Forms\Components\DateTimePicker::make('tgl_masuk')
+                                ->label('Tanggal Masuk')
+                                ->default(now())
+                                ->required(),
+                        ])
+                        ->action(function (array $data, $record) {
+                            \App\Models\kamar_inap::create([
+                                'no_rawat' => $record->no_rawat,
+                                'kd_kamar' => $data['kd_kamar'],
+                                'trf_kamar' => \App\Models\Kamar::find($data['kd_kamar'])->trf_kamar ?? 0,
+                                'diagnosa_awal' => $data['diagnosa_awal'],
+                                'tgl_masuk' => $data['tgl_masuk'],
+                                'jam_masuk' => now()->format('H:i:s'),
+                                'stts_pulang' => '-', // default belum pulang
+                                'stts_kamar' => 'ISI',
+                                'ttl_biaya' => 0,
+                            ]);
+                        })
+    ->requiresConfirmation()
                 ])
                 ->button()
                 ->label('Menu'),
