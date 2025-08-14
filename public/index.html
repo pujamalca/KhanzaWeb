@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhanzaWeb - Solusi Web Terdepan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .typing-effect {
+            border-right: 2px solid #667eea;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: #667eea; }
+            51%, 100% { border-color: transparent; }
+        }
+        
+        .parallax {
+            transform: translateY(0);
+            transition: transform 0.1s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-2xl font-bold">
+                    <span class="gradient-text">KhanzaWeb</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-link text-white hover:text-purple-300 transition-colors">Home</a>
+                    <a href="#about" class="nav-link text-white hover:text-purple-300 transition-colors">About</a>
+                    <a href="#services" class="nav-link text-white hover:text-purple-300 transition-colors">Services</a>
+                    <a href="#portfolio" class="nav-link text-white hover:text-purple-300 transition-colors">Portfolio</a>
+                    <a href="#contact" class="nav-link text-white hover:text-purple-300 transition-colors">Contact</a>
+                </div>
+                <button class="md:hidden text-white text-2xl" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="mobile-menu">
+        <div class="fixed right-0 top-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300" id="mobile-menu-panel">
+            <div class="p-6">
+                <button class="text-gray-600 text-2xl mb-8" id="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="space-y-6">
+                    <a href="#home" class="block text-gray-800 hover:text-purple-600 transition-colors mobile-nav-link">Home</a>
+                    <a href="#about" class="block text-gray-800 hover:text-purple-600 transition-colors mobile-nav-link">About</a>
+                    <a href="#services" class="block text-gray-800 hover:text-purple-600 transition-colors mobile-nav-link">Services</a>
+                    <a href="#portfolio" class="block text-gray-800 hover:text-purple-600 transition-colors mobile-nav-link">Portfolio</a>
+                    <a href="#contact" class="block text-gray-800 hover:text-purple-600 transition-colors mobile-nav-link">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen gradient-bg flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-white">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 fade-in">
+                        Solusi Web
+                        <span class="block gradient-text bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent typing-effect" id="typing-text">Terdepan</span>
+                    </h1>
+                    <p class="text-xl mb-8 fade-in opacity-90">
+                        Menciptakan pengalaman digital yang luar biasa dengan teknologi terdepan dan desain yang memukau.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 fade-in">
+                        <button class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all hover:scale-105 transform">
+                            Mulai Proyek
+                        </button>
+                        <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition-all hover:scale-105 transform">
+                            Lihat Portfolio
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="floating">
+                        <div class="w-96 h-96 bg-white bg-opacity-20 rounded-full blur-3xl absolute top-0 right-0"></div>
+                        <div class="w-72 h-72 bg-purple-400 bg-opacity-30 rounded-full blur-2xl absolute bottom-0 left-0"></div>
+                        <div class="relative z-10 glass-effect rounded-3xl p-8 backdrop-blur-sm">
+                            <div class="text-center text-white">
+                                <i class="fas fa-code text-6xl mb-4"></i>
+                                <h3 class="text-2xl font-bold mb-2">Modern Development</h3>
+                                <p class="opacity-90">Teknologi terkini untuk masa depan digital Anda</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in">
+                    <span class="gradient-text">Tentang KhanzaWeb</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">
+                    Kami adalah tim developer berpengalaman yang berdedikasi untuk menciptakan solusi web yang inovatif dan berkualitas tinggi.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center fade-in card-hover bg-gray-50 p-8 rounded-2xl">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-rocket text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Inovasi</h3>
+                    <p class="text-gray-600">Menggunakan teknologi terdepan untuk menciptakan solusi yang revolusioner.</p>
+                </div>
+                
+                <div class="text-center fade-in card-hover bg-gray-50 p-8 rounded-2xl">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-users text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Tim Profesional</h3>
+                    <p class="text-gray-600">Developer berpengalaman dengan keahlian tinggi di berbagai teknologi.</p>
+                </div>
+                
+                <div class="text-center fade-in card-hover bg-gray-50 p-8 rounded-2xl">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Keamanan</h3>
+                    <p class="text-gray-600">Mengutamakan keamanan data dan privasi dalam setiap proyek.</p>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-8 text-white">
+                        <h3 class="text-3xl font-bold mb-4">Visi Kami</h3>
+                        <p class="text-lg mb-6">Menjadi partner terpercaya dalam transformasi digital dengan memberikan solusi web yang powerful dan user-friendly.</p>
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                                <i class="fas fa-eye text-2xl"></i>
+                            </div>
+                            <span class="text-lg font-semibold">Vision 2025</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">100+ Proyek Selesai</h4>
+                                <p class="text-gray-600">Dengan tingkat kepuasan klien 98%</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center">
+                                <i class="fas fa-clock text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">24/7 Support</h4>
+                                <p class="text-gray-600">Dukungan teknis kapan saja Anda butuhkan</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center">
+                                <i class="fas fa-award text-green-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">Award Winning</h4>
+                                <p class="text-gray-600">Meraih berbagai penghargaan industri</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in">
+                    <span class="gradient-text">Layanan Kami</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">
+                    Solusi lengkap untuk semua kebutuhan digital Anda dengan teknologi terdepan dan pendekatan yang personal.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-laptop-code text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Web Development</h3>
+                    <p class="text-gray-600 mb-6">Pengembangan website responsif dan modern dengan teknologi terkini seperti React, Vue, dan Node.js.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Frontend Development</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Backend Development</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Full Stack Solutions</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Mobile Apps</h3>
+                    <p class="text-gray-600 mb-6">Aplikasi mobile native dan hybrid yang user-friendly untuk iOS dan Android dengan performa optimal.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>iOS Development</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Android Development</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Cross Platform</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-green-500 to-teal-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-paint-brush text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">UI/UX Design</h3>
+                    <p class="text-gray-600 mb-6">Desain antarmuka yang menarik dan pengalaman pengguna yang intuitif untuk meningkatkan engagement.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>User Research</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Wireframing</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Prototyping</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-search text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">SEO Optimization</h3>
+                    <p class="text-gray-600 mb-6">Optimasi mesin pencari untuk meningkatkan visibilitas website Anda di Google dan search engine lainnya.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Keyword Research</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>On-Page SEO</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Technical SEO</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-red-500 to-pink-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Digital Marketing</h3>
+                    <p class="text-gray-600 mb-6">Strategi pemasaran digital yang efektif untuk meningkatkan brand awareness dan konversi.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Social Media Marketing</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Content Marketing</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>PPC Advertising</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 card-hover fade-in shadow-lg">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-cog text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Maintenance</h3>
+                    <p class="text-gray-600 mb-6">Pemeliharaan dan update berkelanjutan untuk memastikan website Anda selalu optimal dan aman.</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Regular Updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Security Monitoring</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Performance Optimization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in">
+                    <span class="gradient-text">Portfolio Kami</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">
+                    Berikut adalah beberapa proyek terbaik yang telah kami kerjakan dengan penuh dedikasi dan profesionalisme.
+                </p>
+            </div>
+            
+            <div class="flex justify-center mb-12">
+                <div class="bg-gray-100 rounded-full p-2 inline-flex fade-in">
+                    <button class="portfolio-filter active px-6 py-3 rounded-full font-semibold transition-all" data-filter="all">
+                        Semua
+                    </button>
+                    <button class="portfolio-filter px-6 py-3 rounded-full font-semibold transition-all" data-filter="web">
+                        Web
+                    </button>
+                    <button class="portfolio-filter px-6 py-3 rounded-full font-semibold transition-all" data-filter="mobile">
+                        Mobile
+                    </button>
+                    <button class="portfolio-filter px-6 py-3 rounded-full font-semibold transition-all" data-filter="design">
+                        Design
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="portfolio-grid">
+                <div class="portfolio-item web card-hover fade-in">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">E-Commerce Platform</h3>
+                            <p class="opacity-90">Platform jual beli online dengan fitur lengkap dan user-friendly</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">React.js • Node.js</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item mobile card-hover fade-in">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Food Delivery App</h3>
+                            <p class="opacity-90">Aplikasi delivery makanan dengan tracking real-time</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">Flutter • Firebase</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item web card-hover fade-in">
+                    <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Corporate Website</h3>
+                            <p class="opacity-90">Website perusahaan dengan CMS custom dan SEO optimized</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">WordPress • PHP</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item design card-hover fade-in">
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Brand Identity</h3>
+                            <p class="opacity-90">Desain identitas visual lengkap untuk startup teknologi</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">Figma • Illustrator</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item mobile card-hover fade-in">
+                    <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Fitness Tracker</h3>
+                            <p class="opacity-90">Aplikasi tracking fitness dengan AI recommendations</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">React Native • AI</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item web card-hover fade-in">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-8 text-white h-64 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Learning Management</h3>
+                            <p class="opacity-90">Platform pembelajaran online dengan video streaming</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm opacity-75">Vue.js • Laravel</span>
+                            <div class="flex space-x-2">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 gradient-bg relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in text-white">
+                    Mari Berkolaborasi
+                </h2>
+                <p class="text-xl text-white opacity-90 max-w-3xl mx-auto fade-in">
+                    Siap untuk mewujudkan ide digital Anda? Hubungi kami sekarang dan mulai perjalanan transformasi digital yang luar biasa.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <div class="fade-in">
+                    <div class="glass-effect rounded-3xl p-8 backdrop-blur-sm">
+                        <h3 class="text-2xl font-bold mb-6 text-white">Informasi Kontak</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-4 text-white">
+                                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Alamat</h4>
+                                    <p class="opacity-90">Jakarta, Indonesia</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 text-white">
+                                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Email</h4>
+                                    <p class="opacity-90">hello@khanzaweb.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 text-white">
+                                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Telepon</h4>
+                                    <p class="opacity-90">+62 812 3456 7890</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="text-lg font-semibold mb-4 text-white">Ikuti Kami</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="bg-white bg-opacity-20 rounded-full p-3 text-white hover:bg-opacity-30 transition-all hover:scale-110 transform">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 rounded-full p-3 text-white hover:bg-opacity-30 transition-all hover:scale-110 transform">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 rounded-full p-3 text-white hover:bg-opacity-30 transition-all hover:scale-110 transform">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 rounded-full p-3 text-white hover:bg-opacity-30 transition-all hover:scale-110 transform">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fade-in">
+                    <form class="glass-effect rounded-3xl p-8 backdrop-blur-sm" id="contact-form">
+                        <div class="mb-6">
+                            <label class="block text-white font-semibold mb-2">Nama Lengkap</label>
+                            <input type="text" name="name" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" placeholder="Masukkan nama lengkap Anda" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-white font-semibold mb-2">Email</label>
+                            <input type="email" name="email" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" placeholder="email@domain.com" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-white font-semibold mb-2">Subjek</label>
+                            <select name="subject" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
+                                <option value="">Pilih jenis layanan</option>
+                                <option value="web">Web Development</option>
+                                <option value="mobile">Mobile App</option>
+                                <option value="design">UI/UX Design</option>
+                                <option value="seo">SEO Optimization</option>
+                                <option value="other">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-white font-semibold mb-2">Pesan</label>
+                            <textarea name="message" rows="4" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 resize-none" placeholder="Ceritakan tentang proyek atau kebutuhan Anda..." required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all hover:scale-105 transform flex items-center justify-center space-x-2">
+                            <span>Kirim Pesan</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">
+                        <span class="gradient-text">KhanzaWeb</span>
+                    </h3>
+                    <p class="text-gray-400 mb-4">Menciptakan solusi digital yang inovatif untuk masa depan yang lebih baik.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Layanan</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Web Development</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Mobile Apps</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">UI/UX Design</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">SEO Optimization</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Perusahaan</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Tentang Kami</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Portfolio</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Karir</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Kontak</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Jakarta, Indonesia</li>
+                        <li>hello@khanzaweb.com</li>
+                        <li>+62 812 3456 7890</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 KhanzaWeb. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('glass-effect');
+                navbar.classList.add('bg-white');
+                navbar.classList.add('bg-opacity-10');
+                navbar.classList.add('backdrop-blur-lg');
+            } else {
+                navbar.classList.remove('glass-effect');
+                navbar.classList.remove('bg-white');
+                navbar.classList.remove('bg-opacity-10');
+                navbar.classList.remove('backdrop-blur-lg');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+        const closeMenu = document.getElementById('close-menu');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.remove('hidden');
+            setTimeout(() => {
+                mobileMenuPanel.classList.remove('translate-x-full');
+            }, 10);
+        });
+
+        closeMenu.addEventListener('click', function() {
+            mobileMenuPanel.classList.add('translate-x-full');
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+            }, 300);
+        });
+
+        // Close mobile menu when clicking outside
+        mobileMenu.addEventListener('click', function(e) {
+            if (e.target === mobileMenu) {
+                mobileMenuPanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+            }
+        });
+
+        // Close mobile menu when clicking nav links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenuPanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+            });
+        });
+
+        // Typing effect
+        const typingText = document.getElementById('typing-text');
+        const words = ['Terdepan', 'Inovatif', 'Profesional', 'Terpercaya'];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeEffect() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typingText.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingText.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                setTimeout(() => {
+                    isDeleting = true;
+                }, 2000);
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+            }
+
+            const typeSpeed = isDeleting ? 100 : 150;
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        typeEffect();
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Portfolio filter
+        const portfolioFilters = document.querySelectorAll('.portfolio-filter');
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+        portfolioFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                portfolioFilters.forEach(f => {
+                    f.classList.remove('active');
+                    f.classList.remove('bg-purple-600');
+                    f.classList.remove('text-white');
+                    f.classList.add('text-gray-600');
+                });
+                
+                // Add active class to clicked filter
+                this.classList.add('active');
+                this.classList.add('bg-purple-600');
+                this.classList.add('text-white');
+                this.classList.remove('text-gray-600');
+                
+                const filterValue = this.getAttribute('data-filter');
+                
+                portfolioItems.forEach(item => {
+                    if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                        item.style.display = 'block';
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 100);
+                    } else {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            item.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Initialize first filter as active
+        portfolioFilters[0].classList.add('bg-purple-600', 'text-white');
+        portfolioFilters[0].classList.remove('text-gray-600');
+
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const subject = formData.get('subject');
+            const message = formData.get('message');
+            
+            // Simple form validation
+            if (!name || !email || !message) {
+                alert('Mohon lengkapi semua field yang diperlukan!');
+                return;
+            }
+            
+            // Simulate form submission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Pesan Anda telah terkirim! Kami akan menghubungi Anda segera.');
+                this.reset();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.parallax');
+            
+            parallaxElements.forEach(element => {
+                const speed = element.dataset.speed || 0.5;
+                const yPos = -(scrolled * speed);
+                element.style.transform = `translateY(${yPos}px)`;
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            
+            // Trigger fade-in animations for visible elements
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    el.classList.add('visible');
+                }
+            });
+        });
+
+        // Add smooth reveal animation for sections
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        });
+
+        // Reveal sections on scroll
+        const sectionObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+
+        // Initialize first section
+        sections[0].style.opacity = '1';
+        sections[0].style.transform = 'translateY(0)';
+    </script>
+</body>
+</html>

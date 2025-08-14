@@ -45,6 +45,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        URL::forceRootUrl(config('app.url') . '/khanzaweb');
+
+
         Route::middleware([AutoLogout::class])->group(base_path('routes/web.php'));
 
 
