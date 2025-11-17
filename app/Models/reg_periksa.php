@@ -127,6 +127,14 @@ class reg_periksa extends Model
         return $this->hasMany(DetailPemberianObat::class, 'no_rawat', 'no_rawat');
     }
 
+    /**
+     * Relasi ke tabel billing_pasien
+     */
+    public function billing()
+    {
+        return $this->hasOne(BillingPasien::class, 'no_rawat', 'no_rawat');
+    }
+
     public static function getEnumValues($column, $table = 'petugas')
     {
         // Ambil informasi kolom dari database

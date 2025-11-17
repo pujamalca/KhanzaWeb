@@ -358,6 +358,27 @@ class RawatJalanResource extends Resource
                 ->formatStateUsing(fn ($record) => $record->detailPemberianObat()->count() > 0 ? $record->detailPemberianObat()->count() . ' item' : 'Belum')
                 ->color(fn ($record) => $record->detailPemberianObat()->count() > 0 ? 'success' : 'gray'),
 
+            Tables\Columns\BadgeColumn::make('billing_status')
+                ->label('Billing')
+                ->formatStateUsing(fn ($record) => {
+                    if (!$record->billing) return 'Belum';
+                    return match($record->billing->status_bayar) {
+                        'Lunas' => '✓ Lunas',
+                        'Cicilan' => '◐ Cicilan',
+                        'Belum Bayar' => '✗ Belum',
+                        default => 'Belum'
+                    };
+                })
+                ->color(fn ($record) => {
+                    if (!$record->billing) return 'gray';
+                    return match($record->billing->status_bayar) {
+                        'Lunas' => 'success',
+                        'Cicilan' => 'warning',
+                        'Belum Bayar' => 'danger',
+                        default => 'gray'
+                    };
+                }),
+
             TextColumn::make('status_poli')
                 ->label('Status Poli')
                 ->sortable()
