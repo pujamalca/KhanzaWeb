@@ -88,6 +88,14 @@ class Databarang extends Model
     }
 
     /**
+     * Relationship: Databarang has many DetailPemberianObat
+     */
+    public function detailPemberianObat()
+    {
+        return $this->hasMany(DetailPemberianObat::class, 'kode_brng', 'kode_brng');
+    }
+
+    /**
      * Scope: Active items only
      */
     public function scopeActive($query)

@@ -102,6 +102,31 @@ class reg_periksa extends Model
         return $this->hasOne(PemeriksaanRalan::class, 'no_rawat', 'no_rawat');
     }
 
+    /**
+     * Relasi ke tabel diagnosa_pasien
+     */
+    public function diagnosaPasien()
+    {
+        return $this->hasMany(DiagnosaPasien::class, 'no_rawat', 'no_rawat');
+    }
+
+    /**
+     * Get primary diagnosis
+     */
+    public function diagnosaPrimary()
+    {
+        return $this->hasOne(DiagnosaPasien::class, 'no_rawat', 'no_rawat')
+                    ->where('prioritas', '1');
+    }
+
+    /**
+     * Relasi ke tabel detail_pemberian_obat (prescriptions)
+     */
+    public function detailPemberianObat()
+    {
+        return $this->hasMany(DetailPemberianObat::class, 'no_rawat', 'no_rawat');
+    }
+
     public static function getEnumValues($column, $table = 'petugas')
     {
         // Ambil informasi kolom dari database

@@ -348,6 +348,16 @@ class RawatJalanResource extends Resource
                 ->formatStateUsing(fn ($record) => $record->pemeriksaanRalan ? 'Sudah' : 'Belum')
                 ->color(fn ($record) => $record->pemeriksaanRalan ? 'success' : 'warning'),
 
+            Tables\Columns\BadgeColumn::make('diagnosis_status')
+                ->label('Diagnosis')
+                ->formatStateUsing(fn ($record) => $record->diagnosaPasien()->count() > 0 ? $record->diagnosaPasien()->count() . ' Dx' : 'Belum')
+                ->color(fn ($record) => $record->diagnosaPasien()->count() > 0 ? 'success' : 'gray'),
+
+            Tables\Columns\BadgeColumn::make('resep_status')
+                ->label('Resep')
+                ->formatStateUsing(fn ($record) => $record->detailPemberianObat()->count() > 0 ? $record->detailPemberianObat()->count() . ' item' : 'Belum')
+                ->color(fn ($record) => $record->detailPemberianObat()->count() > 0 ? 'success' : 'gray'),
+
             TextColumn::make('status_poli')
                 ->label('Status Poli')
                 ->sortable()
