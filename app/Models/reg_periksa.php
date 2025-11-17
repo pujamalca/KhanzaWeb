@@ -94,6 +94,14 @@ class reg_periksa extends Model
         return $this->belongsTo(penjab::class, 'kd_pj', 'kd_pj');
     }
 
+    /**
+     * Relasi ke tabel pemeriksaan_ralan
+     */
+    public function pemeriksaanRalan()
+    {
+        return $this->hasOne(PemeriksaanRalan::class, 'no_rawat', 'no_rawat');
+    }
+
     public static function getEnumValues($column, $table = 'petugas')
     {
         // Ambil informasi kolom dari database

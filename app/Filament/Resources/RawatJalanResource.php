@@ -343,9 +343,15 @@ class RawatJalanResource extends Resource
                 ->label('Status Bayar')
                 ->sortable(),
 
+            Tables\Columns\BadgeColumn::make('pemeriksaan_status')
+                ->label('Pemeriksaan')
+                ->formatStateUsing(fn ($record) => $record->pemeriksaanRalan ? 'Sudah' : 'Belum')
+                ->color(fn ($record) => $record->pemeriksaanRalan ? 'success' : 'warning'),
+
             TextColumn::make('status_poli')
                 ->label('Status Poli')
-                ->sortable(),
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -360,6 +366,19 @@ class RawatJalanResource extends Resource
                     )),
 
                     Tables\Actions\DeleteAction::make(),
+
+                    ActionsAction::make('pemeriksaan')
+                        ->label('Pemeriksaan')
+                        ->icon('heroicon-o-clipboard-document-check')
+                        ->color(fn ($record) => $record->pemeriksaanRalan ? 'success' : 'primary')
+                        ->url(fn ($record) =>
+                            $record->pemeriksaanRalan
+                                ? route('filament.superadmin.resources.pemeriksaan-ralans.view', ['record' => $record->no_rawat])
+                                : route('filament.superadmin.resources.pemeriksaan-ralans.create', ['no_rawat' => $record->no_rawat])
+                        )
+                        ->badge(fn ($record) => $record->pemeriksaanRalan ? 'Sudah' : 'Belum')
+                        ->tooltip(fn ($record) => $record->pemeriksaanRalan ? 'Lihat Pemeriksaan' : 'Buat Pemeriksaan'),
+
                     Action::make('rawatInap')
                         ->label('Rawat Inap')
                         ->icon('heroicon-o-plus-circle') // tersedia default
