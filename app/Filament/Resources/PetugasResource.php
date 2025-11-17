@@ -11,7 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BooleanColumn;
@@ -23,19 +23,17 @@ class PetugasResource extends Resource
 {
     protected static ?string $model = Petugas::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
     public static function getNavigationBadge(): ?string
         {
             return static::getModel()::count();
         }
 
-    protected static ?string $navigationGroup = 'SDM';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Select::make('nip')
                     ->label('NIK Pegawai')
                     ->placeholder('Ambil Dari Data Pegawai')

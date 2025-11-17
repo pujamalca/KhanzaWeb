@@ -7,7 +7,7 @@ use App\Filament\Resources\TrackerResource\RelationManagers;
 use App\Models\Tracker;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
@@ -19,9 +19,8 @@ class TrackerResource extends Resource
 {
     protected static ?string $model = Tracker::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-arrow-path';
 
-    protected static ?string $navigationGroup = 'Admin';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Tracker'; // Setel ke bentuk singular
@@ -32,10 +31,9 @@ class TrackerResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Tracker';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 //
                  //
                  Forms\Components\TextInput::make('nip')

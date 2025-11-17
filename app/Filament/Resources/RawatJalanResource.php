@@ -8,7 +8,7 @@ use App\Filament\Resources\RawatJalanResource\RelationManagers;
 use App\Models\RawatJalan;
 use App\Models\reg_periksa;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,7 +26,7 @@ class RawatJalanResource extends Resource
     use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = reg_periksa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
     {
@@ -41,7 +41,6 @@ class RawatJalanResource extends Resource
     }
 
 
-    protected static ?string $navigationGroup = 'ERM';
 
     // protected static ?int $navigationSort = 0;
 
@@ -108,10 +107,9 @@ class RawatJalanResource extends Resource
         }
 
     
-        public static function form(Form $form): Form
+        public static function form(Schema $schema): Schema
         {
-            return $form
-                ->schema([
+            return $schema->schema([
                 Forms\Components\Select::make('no_rkm_medis')
                     ->label('Nomor RM - Nama')
                     ->options(

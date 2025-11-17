@@ -10,7 +10,7 @@ use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -24,14 +24,13 @@ class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationBadge(): ?string
         {
             return static::getModel()::count();
         }
 
-    protected static ?string $navigationGroup = 'Admin';
 
 
     // Label jamak, ganti dengan singular jika perlu
@@ -43,19 +42,19 @@ class UserResource extends Resource implements HasShieldPermissions
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Pengguna';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Card::make()
                     ->schema([
                 Select::make('pegawai_id')
                         ->label('Pilih Pegawai')
                         ->placeholder('Ambil dari data pegawai')
                         ->options(
-                            Pegawai::all()->mapWithKeys(function ($pegawai) {
-                                return [$pegawai->id => "{$pegawai->nik} - {$pegawai->nama}"];
-                            })->toArray()
+                            Pegawai::query()
+                                ->selectRaw("id, CONCAT(nik, ' - ', nama) as display_name")
+                                ->pluck('display_name', 'id')
+                                ->toArray()
                         )
                         ->searchable()
                         ->live()

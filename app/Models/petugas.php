@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnumValues;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class petugas extends Model
 {
+    use HasEnumValues;
+
     protected $table = 'petugas';
 
     public $incrementing = false;

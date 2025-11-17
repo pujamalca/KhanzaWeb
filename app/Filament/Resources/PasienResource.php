@@ -8,7 +8,7 @@ use App\Models\Pasien;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,9 +20,8 @@ class PasienResource extends Resource
 {
     protected static ?string $model = Pasien::class;
 
-    protected static ?string $navigationGroup = 'ERM';
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
     {
@@ -38,10 +37,9 @@ class PasienResource extends Resource
      // title menu akan berubah
      protected static ?string $navigationLabel = 'Pasien';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Grid::make(3)
                     ->schema([
                 TextInput::make('no_rkm_medis')

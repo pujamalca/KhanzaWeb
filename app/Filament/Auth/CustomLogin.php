@@ -2,11 +2,11 @@
 
 namespace App\Filament\Auth;
 
-use Filament\Pages\Auth\Login;
+use Filament\Auth\Pages\Login;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Validation\ValidationException;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;

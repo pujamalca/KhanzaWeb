@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnumValues;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class master_berkas_pegawai extends Model
 {
+    use HasEnumValues;
+
     //
     protected $table = 'master_berkas_pegawai';
       // Primary key tidak di-increment otomatis

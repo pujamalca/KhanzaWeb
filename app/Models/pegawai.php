@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnumValues;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class Pegawai extends Model
 {
+    use HasEnumValues;
+
     protected $table = 'pegawai';
     protected $primaryKey = 'id';
     public $incrementing = true; // Pastikan ini true

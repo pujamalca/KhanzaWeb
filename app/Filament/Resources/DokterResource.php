@@ -11,7 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BooleanColumn;
@@ -24,14 +24,13 @@ class DokterResource extends Resource
 {
     protected static ?string $model = Dokter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationBadge(): ?string
         {
             return static::getModel()::count();
         }
 
-    protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Dokter'; // Setel ke bentuk singular
@@ -42,10 +41,9 @@ class DokterResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Dokter';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Select::make('kd_dokter')
                     ->label('NIK Pegawai')
                     ->placeholder('Ambil Dari Data Pegawai')

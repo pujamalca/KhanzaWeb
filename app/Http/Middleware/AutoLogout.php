@@ -12,23 +12,14 @@ use App\Models\User;
 
 class AutoLogout
 {
+    /**
+     * Handle an incoming request.
+     *
+     * Note: Expensive database cleanup moved to scheduled command (sessions:cleanup-expired)
+     * This middleware now only handles per-user session validation
+     */
     public function handle(Request $request, Closure $next)
     {
-        // 🔥 Hapus last_session_id dari user yang sesi-nya sudah expired di setiap request
-        $expiredTime = Carbon::now()->subMinutes(config('session.lifetime'));
-
-        $expiredUsers = DB::table('users')
-            ->whereIn('last_session_id', function ($query) use ($expiredTime) {
-                $query->select('id')
-                    ->from('sessions')
-                    ->where('last_activity', '<', $expiredTime->timestamp);
-            })
-            ->update(['last_session_id' => null]);
-
-        if ($expiredUsers > 0) {
-            Log::info("✅ last_session_id dihapus untuk $expiredUsers user yang sesi-nya expired.");
-        }
-
         // 🔍 Jika user sedang login, cek apakah sesi masih valid
         if (Auth::check()) {
             $authUser = Auth::user();

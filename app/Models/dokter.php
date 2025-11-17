@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnumValues;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class dokter extends Model
 {
+    use HasEnumValues;
+
     protected $table = 'dokter';
 
     public $incrementing = false;

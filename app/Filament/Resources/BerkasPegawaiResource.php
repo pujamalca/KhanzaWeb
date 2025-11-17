@@ -15,7 +15,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
@@ -35,7 +35,7 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
     use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = berkas_pegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getNavigationBadge(): ?string
     {
@@ -45,7 +45,6 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
     }
 
 
-    protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = ' Berkas Pegawai'; // Setel ke bentuk singular
@@ -56,10 +55,9 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
     // title menu akan berubah
     protected static ?string $navigationLabel = ' Berkas Pegawai';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 //
                 Select::make('nik')
                 ->label('NIK Pegawai')
@@ -271,9 +269,9 @@ class BerkasPegawaiResource extends Resource implements HasShieldPermissions
         ];
     }
 
-    public static function routes(Panel $panel): void
+    public static function routes(Panel $panel, ?Closure $registerPageRoutes = null): void
 {
-    parent::routes($panel);
+    parent::routes($panel, $registerPageRoutes);
 
     $panel->routes(function ($router) {
         $router->get('/berkas-pegawai/download/{record}/{filename}', function ($record, $filename) {

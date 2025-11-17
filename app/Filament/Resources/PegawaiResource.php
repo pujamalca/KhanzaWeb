@@ -22,7 +22,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Livewire;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Modal\Actions\ButtonAction;
 use Filament\Resources\Resource;
@@ -43,14 +43,13 @@ class PegawaiResource extends Resource
 {
     protected static ?string $model = Pegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 
     public static function getNavigationBadge(): ?string
         {
             return static::getModel()::count();
         }
 
-    protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Pegawai'; // Setel ke bentuk singular
@@ -63,10 +62,9 @@ class PegawaiResource extends Resource
 
     protected $listeners = ['refreshComponent' => '$refresh'];
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\TextInput::make('nik')
                     ->label('NIK')
                     ->required()

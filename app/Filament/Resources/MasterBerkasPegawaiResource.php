@@ -10,7 +10,7 @@ use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,14 +21,13 @@ class MasterBerkasPegawaiResource extends Resource
 {
     protected static ?string $model = master_berkas_pegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getNavigationBadge(): ?string
         {
             return static::getModel()::count();
         }
 
-    protected static ?string $navigationGroup = 'SDM';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Master Berkas Pegawai'; // Setel ke bentuk singular
@@ -39,10 +38,9 @@ class MasterBerkasPegawaiResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Master Berkas Pegawai';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 //
                 TextInput::make('kode')
                     ->label('Kode')

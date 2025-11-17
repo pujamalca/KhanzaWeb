@@ -8,7 +8,7 @@ use App\Models\ranap_gabung;
 use App\Models\RawatInap;
 use App\Models\reg_periksa;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,7 +25,7 @@ class RawatInapResource extends Resource
     use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = reg_periksa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
     public static function getNavigationBadge(): ?string
     {
@@ -34,7 +34,6 @@ class RawatInapResource extends Resource
 
 
 
-    protected static ?string $navigationGroup = 'ERM';
 
     // protected static ?int $navigationSort = 0;
 
@@ -47,10 +46,9 @@ class RawatInapResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Rawat Inap';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 //
             ]);
     }

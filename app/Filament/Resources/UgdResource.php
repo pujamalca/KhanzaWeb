@@ -9,7 +9,7 @@ use App\Models\reg_periksa;
 use App\Models\Ugd;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -30,7 +30,7 @@ class UgdResource extends Resource
     use AppliesUserFilter; // 🔹 Pastikan ini ada
     protected static ?string $model = reg_periksa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bolt';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
     public static function getNavigationBadge(): ?string
     {
@@ -45,7 +45,6 @@ class UgdResource extends Resource
     }
 
 
-    protected static ?string $navigationGroup = 'ERM';
 
     // protected static ?int $navigationSort = 0;
 
@@ -113,10 +112,9 @@ class UgdResource extends Resource
 
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
             Forms\Components\Select::make('no_rkm_medis')
                 ->label('Nomor RM - Nama')
                 ->options(

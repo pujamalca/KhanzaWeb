@@ -6,7 +6,7 @@ use App\Filament\Resources\TrackersqlResource\Pages;
 use App\Filament\Resources\TrackersqlResource\RelationManagers;
 use App\Models\Trackersql;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
@@ -18,9 +18,8 @@ class TrackersqlResource extends Resource
 {
     protected static ?string $model = Trackersql::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-left-end-on-rectangle';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-arrow-left-end-on-rectangle';
 
-    protected static ?string $navigationGroup = 'Admin';
 
     // Label jamak, ganti dengan singular jika perlu
     protected static ?string $pluralLabel = 'Tracker SQL'; // Setel ke bentuk singular
@@ -31,9 +30,9 @@ class TrackersqlResource extends Resource
     // title menu akan berubah
     protected static ?string $navigationLabel = 'Tracker SQL';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Grid::make(1) // Menentukan 3 kolom dalam satu baris
                 ->schema([
                     Forms\Components\Textarea::make('sqle')
