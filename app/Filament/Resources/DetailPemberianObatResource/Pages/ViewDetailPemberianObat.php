@@ -13,6 +13,12 @@ class ViewDetailPemberianObat extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('printResep')
+                ->label('Print Resep')
+                ->icon('heroicon-o-printer')
+                ->color('success')
+                ->url(fn () => route('print.resep', ['no_rawat' => $this->record->no_rawat]))
+                ->openUrlInNewTab(),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
         ];

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Pegawai;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\PrintController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,6 +17,11 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth'])->group(function () {
+    // Print routes
+    Route::get('/print/resep/{no_rawat}', [PrintController::class, 'printResep'])->name('print.resep');
+    Route::get('/print/invoice/{id}', [PrintController::class, 'printInvoice'])->name('print.invoice');
+    Route::get('/print/medical-report/{no_rawat}', [PrintController::class, 'printMedicalReport'])->name('print.medical-report');
+
     Route::get('/berkas-pegawai/download/{record}/{filename}', function ($record, $filename) {
         // Security: Check if user is authenticated
         if (!Auth::check()) {

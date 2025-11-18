@@ -17,6 +17,12 @@ class ViewPemeriksaanRalan extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('printReport')
+                ->label('Print Laporan Medis')
+                ->icon('heroicon-o-printer')
+                ->color('primary')
+                ->url(fn () => route('print.medical-report', ['no_rawat' => $this->record->no_rawat]))
+                ->openUrlInNewTab(),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
         ];

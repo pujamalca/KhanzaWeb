@@ -13,6 +13,12 @@ class ViewBillingPasien extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('printInvoice')
+                ->label('Print Invoice')
+                ->icon('heroicon-o-printer')
+                ->color('info')
+                ->url(fn () => route('print.invoice', ['id' => $this->record->id]))
+                ->openUrlInNewTab(),
             Actions\EditAction::make(),
             Actions\Action::make('addPayment')
                 ->label('Tambah Pembayaran')
